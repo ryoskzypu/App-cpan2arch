@@ -714,20 +714,16 @@ method _get_corelist ($ver)
     my $perl_pkg_ver = version->new($ver)->numify;
 
     my $prog = $self->prog;
-    my $err  = "$prog: failed to get Perl core modules list\n";
 
     if ( $perl_pkg_ver > $perl_cur_ver ) {
-        warn "perl package version ($perl_pkg_ver) is newer than the current perl version ($perl_cur_ver)";
-        warn $err;
-
-        return 1;
+        $self->_pdbg("perl package version ($perl_pkg_ver) is newer than the current perl version ($perl_cur_ver)\n");
     }
 
     my $core_modules = Module::CoreList->find_version($perl_pkg_ver);
     #$self->_pdump('$core_modules', $core_modules, "\n");
 
     if ( !defined $core_modules ) {
-        warn $err;
+        warn "$prog: failed to get Perl core modules list\n";
         return 1;
     }
 

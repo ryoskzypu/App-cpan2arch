@@ -58,7 +58,7 @@ my %WriteMakefileArgs = (
         'URI::Escape'             => '5.34',
         'WWW::Mechanize::Cached'  => '1.56',
         'builtin'                 => '0',
-        'version'                 => '0',
+        'version'                 => '0.9934',
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

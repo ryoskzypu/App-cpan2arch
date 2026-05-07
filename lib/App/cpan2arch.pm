@@ -12,7 +12,7 @@ class App::cpan2arch
   :does(App::cpan2arch::CheckPackages)
   :does(App::cpan2arch::WritePkgbuild);
 
-use version;
+use version 0.9934;
 use File::Basename           qw< basename >;
 use Getopt::Long::More 0.007 qw< GetOptionsFromArray optspec >;
 use Encode                   qw< decode >;

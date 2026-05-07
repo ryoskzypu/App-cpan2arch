@@ -708,7 +708,11 @@ method _get_corelist ($ver)
 {
     $self->_psub;
 
+    # NOTE:
+    #   Module::CoreList version must support the current perl package version,
+    #   so the minimum required version has to be kept updated.
     require Module::CoreList;
+    Module::CoreList->VERSION('5.20260420');
 
     my $perl_cur_ver = $];
     my $perl_pkg_ver = version->new($ver)->numify;

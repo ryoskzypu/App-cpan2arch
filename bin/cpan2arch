@@ -163,6 +163,8 @@ in the shell or add it to a bash startup file (e.g. F</etc/bash.bashrc> or F<~/.
 
   complete -C cpan2arch cpan2arch
 
+Note that L<Getopt::Long::More> is required.
+
 =head1 EXIT STATUS
 
 =for highlighter

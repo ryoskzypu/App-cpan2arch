@@ -36,7 +36,6 @@ my %WriteMakefileArgs = (
         'Encode::Locale'          => '1.05',
         'File::Basename'          => '0',
         'Future::AsyncAwait'      => '0.71',
-        'Getopt::Long::More'      => '0.007',
         'HTTP::Tiny::Mech'        => '1.001002',
         'JSON::MaybeXS'           => '1.004008',
         'List::Compare'           => '0.55',
@@ -93,7 +92,8 @@ my %WriteMakefileArgs = (
             },
             runtime => {
                 recommends => {
-                    'Data::Printer' => '0',
+                    'Data::Printer'      => '0',
+                    'Getopt::Long::More' => '0.007',
                 },
             },
             test => {

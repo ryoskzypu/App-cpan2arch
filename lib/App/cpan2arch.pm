@@ -12,11 +12,10 @@ class App::cpan2arch
   :does(App::cpan2arch::CheckPackages)
   :does(App::cpan2arch::WritePkgbuild);
 
-use version 0.9934;
-use File::Basename           qw< basename >;
-use Getopt::Long::More 0.007 qw< GetOptionsFromArray optspec >;
-use Encode                   qw< decode >;
+use File::Basename qw< basename >;
+use Encode         qw< decode >;
 use Encode::Locale 1.05;
+use version 0.9934;
 
 our $VERSION = 'v1.0.0';
 
@@ -99,13 +98,35 @@ method _process_opts ( $argv = undef )
         warn "$_prog: $msg\n";
     };
 
-    Getopt::Long::More::Configure(
-        qw<
-            default
-            gnu_getopt
-            no_ignore_case
-        >
-    );
+    # Bash completion
+    try {
+        require Getopt::Long::More;
+
+        Getopt::Long::More->VERSION('0.007');
+        Getopt::Long::More->import( qw< GetOptionsFromArray > );
+
+        Getopt::Long::More::Configure(
+            qw<
+                default
+                gnu_getopt
+                no_ignore_case
+            >
+        );
+    }
+    catch ($e) {
+        # Use Getopt::Long as fallback.
+        require Getopt::Long;
+
+        Getopt::Long->import(
+            qw<
+                GetOptionsFromArray
+                :config
+                default
+                gnu_getopt
+                no_ignore_case
+            >
+        );
+    }
 
     GetOptionsFromArray(
         \@args,

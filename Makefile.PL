@@ -35,7 +35,6 @@ my %WriteMakefileArgs = (
         'Encode'                  => '0',
         'Encode::Locale'          => '1.05',
         'File::Basename'          => '0',
-        'Future::AsyncAwait'      => '0.71',
         'HTTP::Tiny::Mech'        => '1.001002',
         'JSON::MaybeXS'           => '1.004008',
         'List::Compare'           => '0.55',

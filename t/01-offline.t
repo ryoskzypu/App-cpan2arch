@@ -553,8 +553,6 @@ subtest 'Unit test' => sub {
                             $c2a->set_env(%env);
                             $c2a->set_meta( $expected->{$DIST}{meta}->%* );
                             $c2a->set_arch_prereqs( $expected->{$DIST}{arch_prereqs}->%* );
-                            use DDP;
-                            p %env if $t eq 'normal_ver';
 
                             $c2a->generate_pkgbuild;
                             my %pkgbuild = $c2a->pkgbuild;
@@ -599,7 +597,6 @@ subtest 'Unit test' => sub {
 
                                 my $outfile = path( $FILES{outfile} )->slurp_utf8;
                                 my $updated = $updated_default;
-                                print $outfile if $t eq 'normal_ver';
 
                                 # Bump pkgrel
                                 {

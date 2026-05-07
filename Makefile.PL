@@ -54,7 +54,6 @@ my %WriteMakefileArgs = (
         'Term::ReadKey'           => '2.38',
         'Term::Table'             => '0',
         'Time::Piece'             => '0',
-        'URI::Escape'             => '5.34',
         'WWW::Mechanize::Cached'  => '1.56',
         'builtin'                 => '0',
         'version'                 => '0.9934',

@@ -299,9 +299,6 @@ async method _fetch ( $muac, @prereqs )
 
     require Mojo::Promise;
 
-    require URI::Escape;
-    URI::Escape->VERSION('5.34');
-
     require JSON::MaybeXS;
     JSON::MaybeXS->VERSION('1.004008');
 
@@ -321,8 +318,8 @@ async method _fetch ( $muac, @prereqs )
             my $url     = $_metacpan_uri . $module;
             my $query;
 
-            $query  = 'version=' . URI::Escape::uri_escape($version) if $version;       # Ignore 0 versions.
-            $url   .= '?' . $query                                   if defined $query;
+            $query  = 'version=' . $version if $version;       # Ignore 0 versions.
+            $url   .= '?' . $query          if defined $query;
 
             $muac->get_p($url);
         },

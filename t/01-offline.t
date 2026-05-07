@@ -578,6 +578,7 @@ subtest 'Unit test' => sub {
                             my ( $stderr, @ret ) = capture_stderr {
                                 return $c2a->write_pkgbuild;
                             };
+                            print $stderr if $t eq 'normal_ver';
 
                             if ( $t =~ /\A(?> no | bogus)_/x || $t eq 'epoch_vercmp' ) {
                                 is(

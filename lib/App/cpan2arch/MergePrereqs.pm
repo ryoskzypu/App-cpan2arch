@@ -3,7 +3,6 @@ use v5.40.0;
 use strict;
 use warnings;
 
-use Future::AsyncAwait;
 use Object::Pad 0.800;
 
 package App::cpan2arch::MergePrereqs;  # For toolchain compatibility.
@@ -203,7 +202,7 @@ method _get_dists ()
             local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
             my $muac = $self->_get_muac('mcpan');
 
-            $self->_fetch( $muac, @prereqs )->wait;
+            $self->_fetch( $muac, @prereqs );
         }
 
         $self->_pdbg("\n");
@@ -251,7 +250,7 @@ method _get_muac ($type)
 
     return undef if $type ne 'mcpan' && $type ne 'arch';
 
-    # Silence logger.
+    # Silence logger
     $logger = Mojo::Log->new( path => '/dev/null' ) unless $env{debug};
 
     my $muac = Mojo::UserAgent::Cached->new(
@@ -293,9 +292,9 @@ method _get_muac ($type)
 }
 
 # Fetch all modules distributions concurrently.
-async method _fetch ( $muac, @prereqs )
+method _fetch ( $muac, @prereqs )
 {
-    $self->_pdbg( __PACKAGE__ . "::_fetch\n\n" );
+    $self->_psub;
 
     require Mojo::Promise;
 
@@ -310,7 +309,7 @@ async method _fetch ( $muac, @prereqs )
     #   https://github.com/metacpan/metacpan-api/blob/master/docs/API-docs.md#download_urlmodule.
     #   https://metacpan.org/release/MIYAGAWA/App-cpanminus-1.7049/source/lib/App/cpanminus/fatscript.pm#L926
     #   https://github.com/metacpan/MetaCPAN-Client/blob/396ba371317f114db04967c90be64bb46fd7fd2c/lib/MetaCPAN/Client.pm#L217
-    return await Mojo::Promise->map(
+    return Mojo::Promise->map(
         { concurrency => 3 },
         sub ($prereq) {
             my $module  = $prereq->{module};
@@ -363,7 +362,7 @@ async method _fetch ( $muac, @prereqs )
               warn $e;
               push @_fetch_errors, $e;
           }
-      );
+      )->wait;
 }
 
 =encoding UTF-8

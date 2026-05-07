@@ -252,8 +252,7 @@ method _build_license_array ()
         }
         # Fallback to its hardcoded licenses.
         else {
-            warn "$prog: $SPDX_PATH does not exist\n";
-            $self->_pdbg("\n");
+            $self->_pdbg("$SPDX_PATH does not exist\n");
 
             # NOTE:
             #   This is necessary for the CI tests since they do not ship with

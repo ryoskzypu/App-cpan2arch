@@ -541,8 +541,10 @@ subtest 'Unit test' => sub {
                     }
 
                     foreach my ( $t, $name ) ( $info->%* ) {
-                        if ( $t =~ /\Aepoch_/ && !can_run('vercmp') ) {
-                            my $TODO = todo 'This test fails when vercmp is not installed';
+                        if ( $t eq 'normal_ver' || $t =~ /\Aepoch_/ ) {
+                            if ( !can_run('vercmp') ) {
+                                my $TODO = todo 'This test fails when vercmp is not installed';
+                            }
                         }
 
                         subtest "$t ($name)" => sub {
@@ -578,7 +580,6 @@ subtest 'Unit test' => sub {
                             my ( $stderr, @ret ) = capture_stderr {
                                 return $c2a->write_pkgbuild;
                             };
-                            print $stderr if $t eq 'normal_ver';
 
                             if ( $t =~ /\A(?> no | bogus)_/x || $t eq 'epoch_vercmp' ) {
                                 is(

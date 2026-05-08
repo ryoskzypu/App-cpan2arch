@@ -75,6 +75,15 @@ subtest 'Unit test' => sub {
 
         my $TODO = todo 'Test fails when parent shell exports the same vars';
 
+        my $ddp = do {
+            try {
+                require Data::Printer;
+            }
+            catch ($e) {
+                false;
+            }
+        };
+
         my %ENV_VARS = (
             packager => {
                 var     => 'PACKAGER',
@@ -124,6 +133,9 @@ subtest 'Unit test' => sub {
                         my $var = $v->{var};
                         my $val = $v->{custom};
 
+                        # Skip custom debug test if DDP is not installed.
+                        next if $var eq 'C2A_DEBUG' && !$ddp;
+
                         $local_env{$var} = $val;
                     }
                 }
@@ -138,6 +150,9 @@ subtest 'Unit test' => sub {
                     my $var  = $v->{var};
                     my $val  = $v->{$t};
                     my $name = $val;
+
+                    # Skip custom debug test if DDP is not installed.
+                    next if $t eq 'custom' && $var eq 'C2A_DEBUG' && !$ddp;
 
                     if ( is_bool($val) ) {
                         $name = $val ? 'true' : 'false';

@@ -466,6 +466,8 @@ subtest 'Integration test' => sub {
     #skip_all;
 
     subtest 'PKGBUILD output (default)' => sub {
+        my $TODO = todo 'This test will fail whenever Arch packages change';
+
         foreach my ( $dist, $data ) ( $expected->%* ) {
             subtest $dist => sub {
                 my $c2a = App::cpan2arch->new;

@@ -1,3 +1,6 @@
+[![CI](https://github.com/ryoskzypu/App-cpan2arch/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/ryoskzypu/App-cpan2arch/actions/workflows/ci.yml)
+[![Coverage Status](https://coveralls.io/repos/github/ryoskzypu/App-cpan2arch/badge.svg?branch=main)](https://coveralls.io/github/ryoskzypu/App-cpan2arch?branch=main)
+
 # App::cpan2arch
 
 **cpan2arch** is a command-line utility that generates an [Arch Linux](https://wiki.archlinux.org/title/Arch_Linux)

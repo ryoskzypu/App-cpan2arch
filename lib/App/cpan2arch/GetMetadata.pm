@@ -8,15 +8,14 @@ use Object::Pad 0.800;
 package App::cpan2arch::GetMetadata;  # For toolchain compatibility.
 role App::cpan2arch::GetMetadata;
 
-use builtin      qw< is_bool >;
-use Scalar::Util qw< looks_like_number >;
+use File::Spec::Functions qw< splitdir >;
+use Scalar::Util          qw< looks_like_number >;
 
 our $VERSION = 'v1.0.0';
 
-field $_mcpan;
-field %_optionals          :reader;
-field $_has_multi_licenses :reader = false;
-field %_meta               :reader :writer;
+field $_muac;
+field %_optionals :reader;
+field %_meta :reader :writer;
 
 # Get CPAN metadata from MetaCPAN's API.
 #
@@ -26,7 +25,7 @@ method get_metadata ()
 {
     $self->_psub;
 
-    $self->_init_mcpan;
+    $self->_init_muac;
 
     # Get the module/distribution and its release.
     my $dist;
@@ -46,7 +45,7 @@ method get_metadata ()
 
         # Since modules and dists names can be ambiguous, e.g. Reply, do not exit
         # if a module request fails, but fallback as dist.
-        $dist = defined $mod ? $mod->distribution : $module;
+        $dist = defined $mod ? $mod->{distribution} : $module;
 
         $self->_pdbg("Dist\n");
         $self->_pdump( '$dist', \$dist, "\n" );
@@ -55,27 +54,18 @@ method get_metadata ()
         return 1 if $rel == 1;
 
         $self->_pdbg("Release\n");
-        $self->_pdump( '$rel->data', \$rel->data, "\n" );
+        $self->_pdump( '$rel', \$rel, "\n" );
     }
 
     # Find Module::Install, license, and XS files in the dist.
-    my %files;
-    {
-        no warnings qw< experimental::builtin >;
-
-        foreach my $type ( qw< mi license xs > ) {
-            my $ret = $self->_find_files( $dist, $type );
-            return 1 if !is_bool($ret) && looks_like_number($ret) && $ret == 1;
-
-            $files{$type} = $ret;
-            $self->_pdump( "\$files{$type}", \$ret, "\n" );
-        }
-    }
+    my $ret = $self->_find_files( $dist, $rel->{download_url} );
+    return 1 if looks_like_number($ret) && $ret == 1;
+    my %files = $ret->%*;
 
     # Get 'optionals_features' descriptions (will be added to the optdepends array).
     # See https://metacpan.org/pod/CPAN::Meta::Spec#optional_features.
     {
-        foreach my ( $feature, $feat_info ) ( $rel->metadata->{optional_features}->%* ) {
+        foreach my ( $feature, $feat_info ) ( $rel->{metadata}{optional_features}->%* ) {
 
             foreach my ( $phase, $phase_info ) ( $feat_info->{prereqs}->%* ) {
 
@@ -92,19 +82,19 @@ method get_metadata ()
     }
 
     %_meta = (
-        author             => $rel->author,
-        name               => $rel->name,
-        dist               => $rel->distribution,
-        version            => $rel->version,
-        abstract           => $rel->abstract,
-        license            => $rel->license,
-        spdx_expression    => $rel->metadata->{x_spdx_expression},
-        dependency         => $rel->dependency,
-        download_url       => $rel->download_url,
-        checksum           => $rel->checksum_sha256,
+        author             => $rel->{author},
+        name               => $rel->{name},
+        dist               => $rel->{distribution},
+        version            => $rel->{version},
+        abstract           => $rel->{abstract},
+        license            => $rel->{license},
+        spdx_expression    => $rel->{metadata}{x_spdx_expression},
+        dependency         => $rel->{dependency},
+        download_url       => $rel->{download_url},
+        checksum           => $rel->{checksum_sha256},
         has_module_install => $files{mi},
         has_license        => $files{license},
-        has_multi_licenses => $_has_multi_licenses,
+        has_multi_licenses => $files{has_multi_licenses},
         has_xs             => $files{xs},
     );
     $self->_pdump( '%_meta', \%_meta, "\n" );
@@ -112,57 +102,71 @@ method get_metadata ()
     return 0;
 }
 
-# Create a MetaCPAN::Client instance.
-method _init_mcpan ()
+method _init_muac ()
+{
+    $self->_psub;
+
+    $_muac = $self->_get_muac('mcpan');
+
+    return $self;
+}
+
+# Create a Mojo::UserAgent::Cached instance.
+method _get_muac ($type)
 {
     # Lazy-load to improve startup time.
-    require MetaCPAN::Client;
-    MetaCPAN::Client->VERSION('2.043000');
+    require Mojo::UserAgent::Cached;
+    Mojo::UserAgent::Cached->VERSION('1.25');
 
-    my %env     = $self->env;
-    my %opts    = $self->opts;
-    my $ua      = $env{user_agent};
-    my $timeout = 10;
+    require Mojo::Log;
+
+    my %env  = $self->env;
+    my %opts = $self->opts;
+    my $logger;
+
+    return undef if $type ne 'mcpan' && $type ne 'arch';
+
+    local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
+
+    # Silence logger
+    $logger = Mojo::Log->new( path => '/dev/null' ) unless $env{debug};
+
+    my $muac = Mojo::UserAgent::Cached->new(
+        $env{debug}
+        ? ()
+        : ( logger => $logger ),
+    );
+    $muac->transactor->name( $env{user_agent} );
 
     # Use CHI as the cache backend.
-    my $chi;
     {
         require CHI;
         CHI->VERSION('0.61');
 
+        my $path =
+            $type eq 'mcpan'
+          ? $env{cache_mcpan_path}
+          : $env{cache_arch_path};
+
+        my $chi;
+
         $chi = CHI->new(
             driver     => 'File',
-            root_dir   => $env{cache_mcpan_path},
+            root_dir   => $path,
             expires_in => $env{cache_expiration},
         ) unless $env{cache_ignore};
 
-        $chi->clear
-          if defined $chi
-          && ( defined $opts{clear} || defined $opts{clear_mcpan} );
+        if ( defined $chi ) {
+            $chi->clear
+              if defined $opts{clear}
+              || ( $type eq 'mcpan' && defined $opts{clear_mcpan} )
+              || ( $type eq 'arch'  && defined $opts{clear_arch} );
+        }
+
+        $muac->cache_agent($chi) unless $env{cache_ignore};
     }
 
-    if ( !$env{cache_ignore} ) {
-        require HTTP::Tiny::Mech;
-        HTTP::Tiny::Mech->VERSION('1.001002');
-
-        require WWW::Mechanize::Cached;
-        WWW::Mechanize::Cached->VERSION('1.56');
-    }
-
-    $_mcpan = MetaCPAN::Client->new(
-        ua => $env{cache_ignore}
-        ? HTTP::Tiny->new(
-            agent   => $ua,
-            timeout => $timeout,
-          )
-        : HTTP::Tiny::Mech->new(
-            agent   => $ua,
-            mechua  => WWW::Mechanize::Cached->new( cache => $chi ),
-            timeout => $timeout,
-        ),
-    );
-
-    return $self;
+    return $muac;
 }
 
 method _get_module ($module)
@@ -170,14 +174,12 @@ method _get_module ($module)
     $self->_psub;
 
     my $prog = $self->prog;
-    my $err  = "$prog: failed to fetch $module module\n";
+    my $url  = "https://fastapi.metacpan.org/v1/module/$module?fields=distribution";
+    my $json;
 
-    my $mod = do {
+    my $res = do {
         try {
-            $_mcpan->module(
-                $module,
-                { fields => 'distribution' },
-            );
+            $_muac->get($url)->result;
         }
         catch ($e) {
             warn $e;
@@ -185,14 +187,19 @@ method _get_module ($module)
         }
     };
 
-    if ( !defined $mod ) {
+    if ( defined $res && $res->is_success ) {
+        $self->_pdbg("\n");
+        $json = $res->json;
+    }
+
+    if ( !defined $json ) {
         warn "$prog: failed to fetch $module module\n";
         $self->_pdbg("\n");
 
         return undef;
     }
 
-    return $mod;
+    return $json;
 }
 
 # References:
@@ -205,43 +212,17 @@ method _get_release ($dist)
     my $version = $args{version};
     my $prog    = $self->prog;
 
-    my $rel = do {
+    my $query = "distribution:$dist%20AND%20";
+    $query
+      .= defined $version
+      ? "version:$version"
+      : 'status:latest';
+
+    my $url = "https://fastapi.metacpan.org/v1/release/_search?q=$query";
+
+    my $res = do {
         try {
-            $_mcpan->release(
-                {
-                    all => [
-                        # For some reason URI dist is unauthorized and only returns
-                        # the latest version; maybe related to PAUSE permissions
-                        # since it had several dists merged.
-                        $dist ne 'URI'
-                        ? { authorized => 'true' }
-                        : (),
-
-                        { distribution => $dist },
-
-                        defined $version
-                        ? { version => $version }
-                        : { status  => 'latest' },
-                    ],
-                },
-                # Return only these fields.
-                {
-                    '_source' => [
-                        qw<
-                            author
-                            name
-                            distribution
-                            version
-                            abstract
-                            license
-                            dependency
-                            download_url
-                            checksum_sha256
-                            metadata
-                        >
-                    ],
-                },
-            )->next;
+            $_muac->get($url)->result;
         }
         catch ($e) {
             warn $e;
@@ -249,7 +230,18 @@ method _get_release ($dist)
         }
     };
 
-    if ( !defined $rel ) {
+    my $json;
+    my $rel;
+
+    if ( defined $res && $res->is_success ) {
+        $self->_pdbg("\n");
+
+        $json = $res->json;
+        $rel  = $json->{hits}{hits}[0]{_source}
+          if defined $json && scalar $json->{hits}{hits}->@*;
+    }
+
+    if ( !defined $json || !defined $rel ) {
         warn "$prog: failed to fetch $dist dist release\n";
         return 1;
     }
@@ -257,73 +249,27 @@ method _get_release ($dist)
     return $rel;
 }
 
-# Check if the distribution has some type of files.
-#
-# References:
-#   https://github.com/metacpan/metacpan-examples/blob/main/scripts/file/1-get-files-in-dist-es.pl
-#   https://metacpan.org/release/MICKEY/MetaCPAN-Client-2.039000/source/examples/es_filter.pl
-#   https://github.com/metacpan/metacpan-examples/blob/main/scripts/file/5-size-of-cpan.pl
-#   https://www.elastic.co/docs/reference/query-languages/query-dsl/query-dsl-bool-query
-#   https://www.elastic.co/docs/reference/query-languages/query-dsl/term-level-queries
-#   https://www.elastic.co/docs/reference/query-languages/query-dsl/regexp-syntax
-method _find_files ( $dist, $type )
+# Check if the distribution has some type of files (M::I, license, XS).
+method _find_files ( $dist, $download_url )
 {
     $self->_psub;
-    $self->_pdump( '$type', \$type, '' );
 
-    my %args    = $self->args;
-    my $version = $args{version};
-    my $prog    = $self->prog;
+    require Path::Tiny;
+    Path::Tiny->VERSION('0.150');
 
-    my $files = do {
+    require Archive::Tar;
+
+    my $prog  = $self->prog;
+    my %files = (
+        mi                 => false,
+        license            => false,
+        has_multi_licenses => false,
+        xs                 => false,
+    );
+
+    my $res = do {
         try {
-            $_mcpan->all(
-                'files',
-                {
-                    '_source' => [ qw< name > ],
-
-                    # Narrow down the search to speed it up.
-                    es_filter => {
-                        bool => {
-                            must => [
-                                { term => { authorized   => 'true' } },
-                                { term => { distribution => $dist } },
-                                {
-                                      term => $type eq 'mi' ? { level => 2 }
-                                    : $type eq 'license' ? { level   => 0 }
-                                    : $type eq 'xs'      ? { indexed => 'true' }
-                                    : (),
-                                },
-                                {
-                                    term => defined $version
-                                    ? { version => $version }
-                                    : { status  => 'latest' },
-                                },
-
-                                $type eq 'mi'
-                                ? { regexp => { path => 'inc/Module/.*' } }
-                                : (),
-
-                                {
-                                    regexp => {
-                                          name => $type eq 'mi' ? 'Install\.pm'
-                                        : $type eq 'license' ? '(LICEN[CS]E|COPYRIGHT|COPYING)([-_.].+)?'
-                                        : $type eq 'xs'      ? 'typemap|.+\.xs'
-                                        : (),
-                                    },
-                                },
-                            ],
-                            must_not => [
-                                { term => { directory => 'true' } },
-
-                                $type eq 'xs'
-                                ? { regexp => { path => '(inc|bin|script|eg|examples|share|x?t)/.*' } }
-                                : (),
-                            ],
-                        },
-                    },
-                },
-            );
+            $_muac->get($download_url)->result;
         }
         catch ($e) {
             warn $e;
@@ -331,49 +277,100 @@ method _find_files ( $dist, $type )
         }
     };
 
-    if ( !defined $files ) {
-        warn "$prog: failed to find $dist $type files\n";
+    if ( !defined $res ) {
+        warn "$prog: failed to fetch $dist tarball release: $download_url\n";
         return 1;
     }
 
-    my $total = $files->total;
-    $self->_pdump( '$total', \$total, '' );
+    if ( $res->is_success ) {
+        $self->_pdbg("\n");
 
-    my $found = false;
+        # Read tarball
+        my @tar_files;
+        {
+            # Save tarball to tempdir so Archive::Tar can detect its compress type.
+            my ($fname) = $download_url =~ m{/([^/]+)\z};
+            my $temp    = Path::Tiny->tempdir;
+            my $tarball = $temp->child($fname);
 
-    if ( $type eq 'mi' ) {
-        # inc/Module/Install.pm
-        if ( $total > 0 ) {
-            $found = true;
-            $self->_pdbg("found Install.pm\n");
+            $res->save_to($tarball);
+
+            my $tar = Archive::Tar->new($tarball);
+
+            if ( !defined $tar ) {
+                warn "$prog: failed to read $fname\n";
+                return 1;
+            }
+
+            @tar_files = $tar->get_files;
+            #$self->_pdump( '@tar_files', \@tar_files, "\n" );
         }
-    }
-    elsif ( $type eq 'license' ) {
+
         my @licenses;
 
-        while ( my $file = $files->next ) {
-            my $fname = $file->{data}{name};
-            push @licenses, $fname;
+        foreach my $f (@tar_files) {
+            if ( $f->is_file ) {
+                my @dirs = splitdir( $f->name );
 
-            $self->_pdbg("found license: $fname\n");
+                # Only top level license files.
+                if ( scalar @dirs == 2 ) {
+                    my $license = $dirs[1];
+
+                    if ( $license =~ /\A(?> LICEN[CS]E | COPYRIGHT | COPYING)(?> [-_.][^\n]+ )?\z/x ) {
+                        push @licenses, $license;
+                        $self->_pdbg("found license: $license\n");
+                    }
+                }
+                elsif ( scalar @dirs == 4 ) {
+                    my $mi = Path::Tiny::path( $dirs[0] )->child( qw< inc Module Install.pm > );
+
+                    # ../inc/Module/Install.pm
+                    if ( $f->name eq $mi->stringify ) {
+                        $files{mi} = true;
+                        $self->_pdbg("found Install.pm\n");
+                    }
+                }
+            }
         }
 
-        # Multiple licenses is uncommon in Perl, so just return a single license
-        # for simplicity, but flag multiple files.
-        @licenses            = sort @licenses;
-        $found               = $licenses[0];
-        $_has_multi_licenses = true if scalar @licenses > 1;
+        $self->_pdbg("\n");
 
-        $self->_pdump( '@licenses', \@licenses, '' );
-    }
-    elsif ( $type eq 'xs' ) {
-        if ( $total > 0 ) {
-            $found = true;
-            $self->_pdbg("found XS file\n");
+        if ( scalar @licenses ) {
+            # Multiple licenses is uncommon in Perl, so just return a single license
+            # for simplicity, but flag multiple files.
+            @licenses                  = sort @licenses;
+            $files{license}            = $licenses[0];
+            $files{has_multi_licenses} = true
+              if scalar @licenses > 1;
+
+            $self->_pdump( '@licenses', \@licenses, "\n" );
+        }
+
+        # XS
+        foreach my $f (@tar_files) {
+            if ( $f->is_file ) {
+                my @dirs = splitdir( $f->name );
+
+                if ( scalar @dirs ) {
+                    # Ignore irrelevant dirs.
+                    next if $dirs[1] && $dirs[1] =~ /\A(?> inc | bin | script | eg | examples | share | x?t)\z/x;
+
+                    my $fname = $dirs[-1];
+
+                    if ( $fname eq 'typemap' || $fname =~ /\A[^.]+\.xs\z/ ) {
+                        $files{xs} = true;
+
+                        $self->_pdbg("found XS: $fname\n\n");
+                        last;
+                    }
+                }
+            }
         }
     }
 
-    return $found;
+    $self->_pdump( '%files', \%files, "\n" );
+
+    return \%files;
 }
 
 =encoding UTF-8
@@ -420,10 +417,6 @@ ryoskzypu <ryoskzypu@proton.me>
 =item *
 
 L<https://blogs.perl.org/users/neilb/2016/12/working-with-the-metacpan-api.html>
-
-=item *
-
-L<MetaCPAN::Client>
 
 =back
 

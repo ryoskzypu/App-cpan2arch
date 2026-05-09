@@ -23,6 +23,7 @@ use Test2::V1 qw<
     pass
     skip_all
     subtest
+    todo
 >;
 
 use lib 't/lib';
@@ -78,98 +79,155 @@ subtest 'Unit test' => sub {
         return ( \%env, $cache_path );
     }
 
-    subtest 'Get metadata' => sub {
+    subtest 'Metadata' => sub {
         #skip_all;
 
-        my $MOD  = 'File::KDBX';
-        my $DIST = 'File-KDBX';
-        my $VER  = $expected->{$DIST}{version};
+        subtest 'Get metadata' => sub {
+            #skip_all;
 
-        my %TESTS_META = (
-            'normal_mod'  => $MOD,
-            'normal_dist' => $DIST,
-            'no_cache'    => $DIST,
-            'bogus_mod'   => 'Bogus::Module',
-            'bogus_dist'  => 'Bogus-Dist',
-        );
+            my $MOD  = 'File::KDBX';
+            my $DIST = 'File-KDBX';
+            my $VER  = $expected->{$DIST}{version};
 
-        foreach my ( $t, $name ) (%TESTS_META) {
-            subtest "$t ($name)" => sub {
-                my $c2a = App::cpan2arch->new;
+            my %TESTS_META = (
+                'normal_mod'  => $MOD,
+                'normal_dist' => $DIST,
+                'no_cache'    => $DIST,
+                'bogus_mod'   => 'Bogus::Module',
+                'bogus_dist'  => 'Bogus-Dist',
+            );
 
-                my ( $env, $cache_path ) = get_env_cache( $t, 'mcpan_cache' );
-                $c2a->set_env( $env->%* );
+            foreach my ( $t, $name ) (%TESTS_META) {
+                subtest "$t ($name)" => sub {
+                    my $c2a = App::cpan2arch->new;
 
-                my @argv = $name;
-                push @argv, $VER if $t eq 'normal_dist' || $t eq 'no_cache';
-                $c2a->_process_opts( \@argv );
+                    my ( $env, $cache_path ) = get_env_cache( $t, 'mcpan_cache' );
+                    $c2a->set_env( $env->%* );
 
-                # Error
-                if ( $t =~ /\Abogus_/ ) {
-                    my ( $stderr, @ret ) = capture_stderr {
-                        return $c2a->get_metadata;
-                    };
+                    my @argv = $name;
+                    push @argv, $VER if $t eq 'normal_dist' || $t eq 'no_cache';
+                    $c2a->_process_opts( \@argv );
+
+                    # Error
+                    if ( $t =~ /\Abogus_/ ) {
+                        my ( $stderr, @ret ) = capture_stderr {
+                            return $c2a->get_metadata;
+                        };
+
+                        is(
+                            $ret[0], number(1),
+                            'return value (error)',
+                        );
+
+                        return;
+                    }
+
+                    my $ret       = $c2a->get_metadata;
+                    my %optionals = $c2a->optionals;
+                    my %meta      = $c2a->meta;
+
+                    # Cache
+                    if ( $t eq 'no_cache' ) {
+                        is(
+                            !-d $cache_path, T(),
+                            'has no cache',
+                        );
+                    }
+                    else {
+                        my @caches = path($cache_path)->child('Default')->children;
+                        #system( 'tree', '-a', $cache_path );
+
+                        is(
+                            scalar @caches, number_gt(0),
+                            'has cache',
+                        );
+
+                        # Clear cache
+                        $c2a->_process_opts( [ qw< --clear >, $DIST ] );
+                        $c2a->_get_muac('mcpan');
+                        my @cl_caches = path($cache_path)->children;
+                        #system( 'tree', '-a', $cache_path );
+
+                        is(
+                            scalar @caches, number_gt( scalar @cl_caches ),
+                            'has cleared cache',
+                        );
+                    }
+
+                    # Module (normal_mod) only fetches the latest release, so it cannot
+                    # be tested reliably like the versioned dist.
+                    if ( $t eq 'normal_dist' || $t eq 'no_cache' ) {
+                        is(
+                            %optionals, $expected->{$DIST}{optionals}->%*,
+                            'optionals match',
+                        );
+
+                        is(
+                            %meta, $expected->{$DIST}{meta}->%*,
+                            'metadata match',
+                        );
+                    }
 
                     is(
-                        $ret[0], number(1),
-                        'return value (error)',
+                        $ret, number(0),
+                        'return value (success)',
                     );
+                };
+            }
+        };
 
-                    return;
-                }
+        subtest 'Find files' => sub {
+            #skip_all;
 
-                my $ret       = $c2a->get_metadata;
-                my %optionals = $c2a->optionals;
-                my %meta      = $c2a->meta;
+            my $DIST = 'Padre';
+            my $URL  = 'https://cpan.metacpan.org/authors/id/S/SZ/SZABGAB/Padre-1.02.tar.gz';
 
-                # Cache
-                if ( $t eq 'no_cache' ) {
+            # Expected files
+            my %FILES = (
+                mi                 => true,
+                license            => 'COPYING',
+                has_multi_licenses => true,
+                xs                 => true,
+            );
+
+            my %TESTS_FILES = (
+                normal    => $URL,
+                bogus_url => 'https://bogus',
+                bogus_tar => 'https://ftp.gnu.org/gnu/tar/tar-1.24.tar.xz',
+            );
+
+            foreach my ( $t, $name ) (%TESTS_FILES) {
+                subtest "$t ($name)" => sub {
+                    my $c2a = App::cpan2arch->new;
+
+                    $c2a->_init_muac;
+
+                    if ( $t =~ /\Abogus_/ ) {
+                        if ( $t eq 'bogus_tar' ) {
+                            my $TODO = todo 'This test fails if IO::Uncompress::UnXz is installed';
+                        }
+
+                        my ( $stderr, @ret ) = capture_stderr {
+                            return $c2a->_find_files( $DIST, $name );
+                        };
+
+                        is(
+                            $ret[0], number(1),
+                            'return value (error)',
+                        );
+
+                        return;
+                    }
+
+                    my $ret = $c2a->_find_files( $DIST, $name );
+
                     is(
-                        !-d $cache_path, T(),
-                        'has no cache',
+                        $ret, \%FILES,
+                        'files match',
                     );
-                }
-                else {
-                    my @caches = path($cache_path)->child('Default')->children;
-                    #system( 'tree', '-a', $cache_path );
-
-                    is(
-                        scalar @caches, number_gt(0),
-                        'has cache',
-                    );
-
-                    # Clear cache
-                    $c2a->_process_opts( [ qw< --clear >, $DIST ] );
-                    $c2a->_init_mcpan;
-                    my @cl_caches = path($cache_path)->child('Default')->children;
-                    #system( 'tree', '-a', $cache_path );
-
-                    is(
-                        scalar @caches, number_gt( scalar @cl_caches ),
-                        'has cleared cache',
-                    );
-                }
-
-                # Module (normal_mod) only fetches the latest release, so it cannot
-                # be tested reliably like the versioned dist.
-                if ( $t eq 'normal_dist' || $t eq 'no_cache' ) {
-                    is(
-                        %optionals, $expected->{$DIST}{optionals}->%*,
-                        'optionals match',
-                    );
-
-                    is(
-                        %meta, $expected->{$DIST}{meta}->%*,
-                        'metadata match',
-                    );
-                }
-
-                is(
-                    $ret, number(0),
-                    'return value (success)',
-                );
-            };
-        }
+                };
+            }
+        };
     };
 
     subtest 'Merge prereqs' => sub {

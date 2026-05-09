@@ -646,19 +646,12 @@ method _get_json ($url)
 {
     $self->_psub;
 
-    require JSON::MaybeXS;
-    JSON::MaybeXS->VERSION('1.004008');
-
     my $prog = $self->prog;
 
     # Request JSON
     my $res;
     {
-        my %env = $self->env;
-
-        local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
-        my $muac = $self->_get_muac('arch');
-
+        my $muac    = $self->_get_muac('arch');
         my $OK      = 200;
         my $get_err = "$prog: failed to request $url\n";
 
@@ -688,15 +681,18 @@ method _get_json ($url)
     # Decode JSON
     my $json = do {
         try {
-            JSON::MaybeXS::decode_json( $res->body );
+            $res->json;
         }
         catch ($e) {
             warn $e;
-            warn "$prog: failed to decode $url\n";
-
-            return 1;
+            undef;
         }
     };
+
+    if ( !defined $json ) {
+        warn "$prog: failed to decode $url\n";
+        return 1;
+    }
 
     $self->_pdbg("\n");
 

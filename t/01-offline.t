@@ -32,8 +32,6 @@ use TestData qw< expected_data test_diff >;
 use App::cpan2arch;
 
 use builtin            qw< is_bool >;
-use Cwd                qw< getcwd >;
-use File::Basename     qw< basename >;
 use Capture::Tiny 0.50 qw< capture_stdout capture_stderr >;
 use Path::Tiny 0.150;
 use Devel::CheckBin 0.04;
@@ -515,7 +513,7 @@ subtest 'Unit test' => sub {
                     $SRCINFO{bogus_pkgver}  = $SRCINFO{default} =~ s{^\tpkgver = \K[^\n]+$}{99999}mr;
                     $SRCINFO{bogus_pkgrel}  = $SRCINFO{default} =~ s{^\tpkgrel = \K[^\n]+$}{bogus}mr;
 
-                    my $PROG = basename($0);
+                    my $PROG = path($0)->basename;
 
                     # Expected metadata comparison
                     # (Table generated from 199x40 TTY)
@@ -575,7 +573,7 @@ subtest 'Unit test' => sub {
                             my %pkgbuild = $c2a->pkgbuild;
 
                             # Emulate current dir behavior.
-                            my $cwd  = getcwd();
+                            my $cwd  = Path::Tiny->cwd;
                             my $temp = Path::Tiny->tempdir;
                             chdir $temp or die $!;
 
@@ -669,7 +667,7 @@ subtest 'Unit test' => sub {
                             $c2a->set_pkgbuild(%pkgbuild) if $t ne 'nothing';
 
                             # Emulate current dir behavior.
-                            my $cwd  = getcwd();
+                            my $cwd  = Path::Tiny->cwd;
                             my $temp = Path::Tiny->tempdir;
                             chdir $temp or die $!;
 

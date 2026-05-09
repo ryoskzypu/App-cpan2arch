@@ -196,14 +196,7 @@ method _get_dists ()
 
     # Fetch dists.
     {
-        if ( scalar @prereqs ) {
-            my %env = $self->env;
-
-            local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
-            my $muac = $self->_get_muac('mcpan');
-
-            $self->_fetch( $muac, @prereqs );
-        }
+        $self->_fetch( @prereqs ) if scalar @prereqs;
 
         $self->_pdbg("\n");
         $self->_pdump( '@_prereq_dists', \@_prereq_dists, "\n" );
@@ -236,72 +229,15 @@ method _get_dists ()
     return \@prereqs;
 }
 
-# Create a Mojo::UserAgent::Cached instance.
-method _get_muac ($type)
-{
-    require Mojo::UserAgent::Cached;
-    Mojo::UserAgent::Cached->VERSION('1.25');
-
-    require Mojo::Log;
-
-    my %env  = $self->env;
-    my %opts = $self->opts;
-    my $logger;
-
-    return undef if $type ne 'mcpan' && $type ne 'arch';
-
-    # Silence logger
-    $logger = Mojo::Log->new( path => '/dev/null' ) unless $env{debug};
-
-    my $muac = Mojo::UserAgent::Cached->new(
-        $env{debug}
-        ? ()
-        : ( logger => $logger ),
-    );
-    $muac->transactor->name( $env{user_agent} );
-
-    # Use CHI as the cache backend.
-    {
-        require CHI;
-        CHI->VERSION('0.61');
-
-        my $path =
-            $type eq 'mcpan'
-          ? $env{cache_mcpan_path}
-          : $env{cache_arch_path};
-
-        my $chi;
-
-        $chi = CHI->new(
-            driver     => 'File',
-            root_dir   => $path,
-            expires_in => $env{cache_expiration},
-        ) unless $env{cache_ignore};
-
-        if ( defined $chi ) {
-            $chi->clear
-              if defined $opts{clear}
-              || ( $type eq 'mcpan' && defined $opts{clear_mcpan} )
-              || ( $type eq 'arch'  && defined $opts{clear_arch} );
-        }
-
-        $muac->cache_agent($chi) unless $env{cache_ignore};
-    }
-
-    return $muac;
-}
-
 # Fetch all modules distributions concurrently.
-method _fetch ( $muac, @prereqs )
+method _fetch ( @prereqs )
 {
     $self->_psub;
 
     require Mojo::Promise;
 
-    require JSON::MaybeXS;
-    JSON::MaybeXS->VERSION('1.004008');
-
     my $prog = $self->prog;
+    my $muac = $self->_get_muac('mcpan');
 
     # Fetch three dists at a time using the download_url endpoint.
     #
@@ -330,7 +266,7 @@ method _fetch ( $muac, @prereqs )
                   my $res = $tx->[0]->result;
 
                   if ( $res->is_success ) {
-                      my $json = JSON::MaybeXS::decode_json( $res->body );
+                      my $json = $res->json;
                       push @_prereq_dists, $json->{distribution};
                   }
                   # Do not exit but flag if MetaCPAN API fails to fetch a module,

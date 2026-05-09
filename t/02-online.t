@@ -204,7 +204,7 @@ subtest 'Unit test' => sub {
 
                     if ( $t =~ /\Abogus_/ ) {
                         if ( $t eq 'bogus_tar' ) {
-                            my $TODO = todo 'This test fails if IO::Uncompress::UnXz is installed';
+                            my $TODO = todo 'This test fails when IO::Uncompress::UnXz is installed';
                         }
 
                         my ( $stderr, @ret ) = capture_stderr {

@@ -20,7 +20,7 @@ use version 0.9934;
 our $VERSION = 'v1.0.0';
 
 field $_prog :reader = basename($0);
-field %_env :reader :writer = (
+field %_env  :reader :writer = (
     user_agent       => "App::cpan2arch/$VERSION",
     cache_mcpan_path => '/tmp/mcpan_cache',
     cache_arch_path  => '/tmp/arch_cache',

@@ -15,7 +15,7 @@ our $VERSION = 'v1.0.0';
 
 field $_muac;
 field %_optionals :reader;
-field %_meta :reader :writer;
+field %_meta      :reader :writer;
 
 # Get CPAN metadata from MetaCPAN's API.
 #

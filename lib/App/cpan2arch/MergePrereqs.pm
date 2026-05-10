@@ -2,7 +2,7 @@ use v5.42.0;
 
 use strict;
 use warnings;
-no source::encoding;
+no source::encoding;  # Avoid dying on v5.42.0 (non-ASCII char in POD).
 
 use Object::Pad 0.825;
 

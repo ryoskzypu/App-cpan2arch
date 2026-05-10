@@ -72,7 +72,7 @@ subtest 'Unit test' => sub {
             user_agent       => "$DEFS{class}/$DEFS{ver}",
             $cache_key       => $cache_path,
             cache_expiration => '1d',
-            cache_ignore     => $t eq 'no_cache' ? true : false,
+            cache_ignore     => $t =~ /\Ano_cache/ ? true : false,
             #debug            => true,
         );
 
@@ -93,7 +93,8 @@ subtest 'Unit test' => sub {
             my %TESTS_META = (
                 'normal_mod'    => $MOD,
                 'normal_dist'   => $DIST,
-                'no_cache'      => $DIST,
+                'no_cache_mod'  => $MOD,
+                'no_cache_dist' => $DIST,
                 'bogus_mod'     => 'Bogus::Module',
                 'bogus_dist'    => 'Bogus-Dist',
                 'bogus_mod_end' => $MOD,
@@ -108,7 +109,7 @@ subtest 'Unit test' => sub {
                     $c2a->set_env( $env->%* );
 
                     my @argv = $name;
-                    push @argv, $VER if $t eq 'normal_dist' || $t eq 'no_cache';
+                    push @argv, $VER if $t eq 'normal_dist' || $t eq 'no_cache_dist';
                     $c2a->_process_opts( \@argv );
 
                     # Error
@@ -137,7 +138,7 @@ subtest 'Unit test' => sub {
                     my %meta      = $c2a->meta;
 
                     # Cache
-                    if ( $t eq 'no_cache' ) {
+                    if ( $t =~ /\Ano_cache_/ ) {
                         is(
                             !-d $cache_path, T(),
                             'has no cache',
@@ -166,7 +167,7 @@ subtest 'Unit test' => sub {
 
                     # Module (normal_mod) only fetches the latest release, so it cannot
                     # be tested reliably like the versioned dist.
-                    if ( $t eq 'normal_dist' || $t eq 'no_cache' ) {
+                    if ( $t eq 'normal_dist' || $t eq 'no_cache_dist' ) {
                         is(
                             %optionals, $expected->{$DIST}{optionals}->%*,
                             'optionals match',

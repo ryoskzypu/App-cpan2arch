@@ -314,7 +314,7 @@ following:
 
 =item *
 
-Missing optional runtime dependencies (L<Data::Printer>)
+Missing runtime dependencies (L<Data::Printer>, L<vercmp|https://man.archlinux.org/man/vercmp.8>)
 
 =item *
 
@@ -322,15 +322,23 @@ Invalid command-line options
 
 =item *
 
-C<perl> version issues
-
-=item *
-
-Network issues
+Network/JSON issues
 
 =item *
 
 MetaCPAN/Arch API issues
+
+=item *
+
+Dist tarball issues
+
+=item *
+
+C<perl> version issues
+
+=item *
+
+L<Module::CoreList> issues
 
 =item *
 

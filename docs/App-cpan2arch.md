@@ -60,11 +60,13 @@ Takes no arguments and returns `0` on success.
 This module reports errors to `STDERR` and exits with a non-zero status in the
 following:
 
-- Missing optional runtime dependencies ([Data::Printer](https://metacpan.org/pod/Data%3A%3APrinter))
+- Missing runtime dependencies ([Data::Printer](https://metacpan.org/pod/Data%3A%3APrinter), [vercmp](https://man.archlinux.org/man/vercmp.8))
 - Invalid command-line options
-- `perl` version issues
-- Network issues
+- Network/JSON issues
 - MetaCPAN/Arch API issues
+- Dist tarball issues
+- `perl` version issues
+- [Module::CoreList](https://metacpan.org/pod/Module%3A%3ACoreList) issues
 - File access/permission/metadata issues
 
 See ["EXIT-STATUS" in cpan2arch](https://metacpan.org/pod/cpan2arch#EXIT-STATUS) for exit code details.

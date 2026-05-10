@@ -51,7 +51,6 @@ my %WriteMakefileArgs = (
         'Term::ReadKey'           => '2.38',
         'Term::Table'             => '0',
         'Time::Piece'             => '0',
-        'builtin'                 => '0',
         'version'                 => '0.9934',
     },
     META_MERGE => {

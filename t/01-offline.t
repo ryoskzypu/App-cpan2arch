@@ -31,7 +31,7 @@ use lib 't/lib';
 use TestData qw< expected_data test_diff >;
 use App::cpan2arch;
 
-use builtin            qw< is_bool >;
+use builtin qw< is_bool >;
 use Capture::Tiny 0.50 qw< capture_stdout capture_stderr >;
 use Path::Tiny 0.150;
 use Devel::CheckBin 0.04;
@@ -428,14 +428,14 @@ subtest 'Unit test' => sub {
 
         my %TESTS_OUT = (
             '--update' => {
-                #normal_ver   => 'PKGBUILD + version updated',
+                normal_ver   => 'PKGBUILD + version updated',
                 normal_bump  => 'PKGBUILD updated + pkgrel bumped',
                 normal_comp  => '.SRCINFO != generated metadata',
                 normal_epoch => 'PKGBUILD updated + preserve epoch',
 
-                #epoch_add    => 'PKGBUILD updated + add epoch',
-                #epoch_bump   => 'PKGBUILD updated + bump epoch',
-                #epoch_vercmp => 'no vercmp',
+                epoch_add    => 'PKGBUILD updated + add epoch',
+                epoch_bump   => 'PKGBUILD updated + bump epoch',
+                epoch_vercmp => 'no vercmp',
 
                 no_files => 'no .SRCINFO or PKGBUILD',
                 no_vars  => 'no pkgbase/pkgver/pkgrel in .SRCINFO',
@@ -554,11 +554,9 @@ subtest 'Unit test' => sub {
                     }
 
                     foreach my ( $t, $name ) ( $info->%* ) {
-                        if ( $t eq 'normal_ver' || $t =~ /\Aepoch_/ ) {
-                            if ( !can_run('vercmp') ) {
-                                my $TODO = todo 'This test fails when vercmp is not installed';
-                            }
-                        }
+                        my $TODO;
+                        $TODO = todo 'This test fails when vercmp is not installed'
+                          if ( ( $t eq 'normal_ver' || $t =~ /\Aepoch_/ ) && !can_run('vercmp') );
 
                         subtest "$t ($name)" => sub {
                             my $c2a = App::cpan2arch->new;

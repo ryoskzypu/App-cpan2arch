@@ -1,9 +1,9 @@
-use v5.40.0;
+use v5.42.0;
 
 use strict;
 use warnings;
 
-use Object::Pad 0.800;
+use Object::Pad 0.825;
 
 package App::cpan2arch;  # For toolchain compatibility.
 class App::cpan2arch

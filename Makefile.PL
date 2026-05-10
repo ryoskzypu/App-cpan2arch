@@ -1,4 +1,4 @@
-use v5.40.0;
+use v5.42.0;
 
 use strict;
 use warnings;
@@ -11,7 +11,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/App/cpan2arch.pm',
     ABSTRACT_FROM    => 'lib/App/cpan2arch.pm',
     LICENSE          => 'open_source',
-    MIN_PERL_VERSION => 'v5.40.0',
+    MIN_PERL_VERSION => 'v5.42.0',
     EXE_FILES        => [
         'bin/cpan2arch',
     ],
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
         'Mojo::Promise'           => '0',
         'Mojo::UserAgent::Cached' => '1.25',
         'Mojolicious'             => '9.45',
-        'Object::Pad'             => '0.800',
+        'Object::Pad'             => '0.825',
         'Path::Tiny'              => '0.150',
         'Pod::Usage'              => '0',
         'Scalar::Util'            => '0',

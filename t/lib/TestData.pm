@@ -1,6 +1,6 @@
 package TestData;
 
-use v5.40.0;
+use v5.42.0;
 
 use strict;
 use warnings;

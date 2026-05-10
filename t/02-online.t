@@ -8,7 +8,7 @@
 #   (Official repositories web interface + Aurweb RPC interface) APIs and will
 #   likely break and need fixing whenever packages change.
 
-use v5.40.0;
+use v5.42.0;
 
 use strict;
 use warnings;

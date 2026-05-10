@@ -7,7 +7,7 @@
 #   To see verbose output in correct order, use yath or run:
 #     prove -l xt/boilerplate.t --merge -v
 
-use v5.40.0;
+use v5.42.0;
 
 use strict;
 use warnings;

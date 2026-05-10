@@ -85,16 +85,19 @@ subtest 'Unit test' => sub {
         subtest 'Get metadata' => sub {
             #skip_all;
 
-            my $MOD  = 'File::KDBX';
-            my $DIST = 'File-KDBX';
-            my $VER  = $expected->{$DIST}{version};
+            my $MOD       = 'File::KDBX';
+            my $DIST      = 'File-KDBX';
+            my $VER       = $expected->{$DIST}{version};
+            my $BOGUS_END = 'https://bogus/';
 
             my %TESTS_META = (
-                'normal_mod'  => $MOD,
-                'normal_dist' => $DIST,
-                'no_cache'    => $DIST,
-                'bogus_mod'   => 'Bogus::Module',
-                'bogus_dist'  => 'Bogus-Dist',
+                'normal_mod'    => $MOD,
+                'normal_dist'   => $DIST,
+                'no_cache'      => $DIST,
+                'bogus_mod'     => 'Bogus::Module',
+                'bogus_dist'    => 'Bogus-Dist',
+                'bogus_mod_end' => $MOD,
+                'bogus_rel_end' => $DIST,
             );
 
             foreach my ( $t, $name ) (%TESTS_META) {
@@ -110,6 +113,13 @@ subtest 'Unit test' => sub {
 
                     # Error
                     if ( $t =~ /\Abogus_/ ) {
+                        if ( $t eq 'bogus_mod_end' ) {
+                            $c2a->set_mod_endpoint($BOGUS_END);
+                        }
+                        elsif ( $t eq 'bogus_rel_end' ) {
+                            $c2a->set_rel_endpoint($BOGUS_END);
+                        }
+
                         my ( $stderr, @ret ) = capture_stderr {
                             return $c2a->get_metadata;
                         };
@@ -238,7 +248,7 @@ subtest 'Unit test' => sub {
         my %TESTS_MERGE = (
             'normal'    => $DIST,
             'no_cache'  => $DIST,
-            'bogus_uri' => 'https://bogus',
+            'bogus_url' => 'https://bogus',
         );
 
         foreach my ( $t, $name ) (%TESTS_MERGE) {
@@ -250,8 +260,8 @@ subtest 'Unit test' => sub {
 
                 $c2a->set_meta( $expected->{$DIST}{meta}->%* );
 
-                if ( $t eq 'bogus_uri' ) {
-                    $c2a->set_metacpan_uri($name);
+                if ( $t eq 'bogus_url' ) {
+                    $c2a->set_dl_endpoint($name);
 
                     my ( $stderr, @ret ) = capture_stderr {
                         return $c2a->merge_prereqs;
@@ -386,7 +396,7 @@ subtest 'Unit test' => sub {
 
             my %TESTS_JSON = (
                 normal           => 'https://archlinux.org/packages/core/x86_64/perl/json/',
-                bogus_uri        => 'https://bogus',
+                bogus_url        => 'https://bogus',
                 bogus_error_code => 'https://httpbin.org/status/500',
                 bogus_json       => 'https://httpbin.org/status/200',
             );

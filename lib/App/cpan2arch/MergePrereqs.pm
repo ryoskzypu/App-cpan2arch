@@ -2,6 +2,7 @@ use v5.42.0;
 
 use strict;
 use warnings;
+no source::encoding;
 
 use Object::Pad 0.825;
 
@@ -13,10 +14,10 @@ use List::Util   qw< any >;
 
 our $VERSION = 'v1.0.0';
 
+field $_dl_endpoint  :reader :writer = 'https://fastapi.metacpan.org/v1/download_url/';
 field %_cpan_prereqs :reader :writer;
-field $_metacpan_uri :reader :writer = 'https://fastapi.metacpan.org/v1/download_url/';
-field @_prereq_dists;
 field @_fetch_errors :reader;
+field @_prereq_dists;
 
 # Merge CPAN prerequisites to PKGBUILD dependencies.
 #
@@ -196,7 +197,7 @@ method _get_dists ()
 
     # Fetch dists.
     {
-        $self->_fetch( @prereqs ) if scalar @prereqs;
+        $self->_fetch(@prereqs) if scalar @prereqs;
 
         $self->_pdbg("\n");
         $self->_pdump( '@_prereq_dists', \@_prereq_dists, "\n" );
@@ -230,7 +231,7 @@ method _get_dists ()
 }
 
 # Fetch all modules distributions concurrently.
-method _fetch ( @prereqs )
+method _fetch (@prereqs)
 {
     $self->_psub;
 
@@ -250,7 +251,7 @@ method _fetch ( @prereqs )
         sub ($prereq) {
             my $module  = $prereq->{module};
             my $version = $prereq->{version};
-            my $url     = $_metacpan_uri . $module;
+            my $url     = $_dl_endpoint . $module;
             my $query;
 
             $query  = 'version=' . $version if $version;       # Ignore 0 versions.

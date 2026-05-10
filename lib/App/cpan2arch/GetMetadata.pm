@@ -2,6 +2,7 @@ use v5.42.0;
 
 use strict;
 use warnings;
+no source::encoding;
 
 use Object::Pad 0.825;
 
@@ -14,8 +15,10 @@ use Scalar::Util          qw< looks_like_number >;
 our $VERSION = 'v1.0.0';
 
 field $_muac;
-field %_optionals :reader;
-field %_meta      :reader :writer;
+field $_mod_endpoint :reader :writer = 'https://fastapi.metacpan.org/v1/module/';
+field $_rel_endpoint :reader :writer = 'https://fastapi.metacpan.org/v1/release/';
+field %_optionals    :reader;
+field %_meta         :reader :writer;
 
 # Get CPAN metadata from MetaCPAN's API.
 #
@@ -174,7 +177,7 @@ method _get_module ($module)
     $self->_psub;
 
     my $prog = $self->prog;
-    my $url  = "https://fastapi.metacpan.org/v1/module/$module?fields=distribution";
+    my $url  = $_mod_endpoint . "$module?fields=distribution";
     my $json;
 
     my $res = do {
@@ -218,7 +221,7 @@ method _get_release ($dist)
       ? "version:$version"
       : 'status:latest';
 
-    my $url = "https://fastapi.metacpan.org/v1/release/_search?q=$query";
+    my $url = $_rel_endpoint . "_search?q=$query";
 
     my $res = do {
         try {

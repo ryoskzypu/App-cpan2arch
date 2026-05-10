@@ -36,6 +36,7 @@ my %WriteMakefileArgs = (
         'Encode::Locale'          => '1.05',
         'File::Basename'          => '0',
         'File::Spec::Functions'   => '0',
+        'IO::Socket::SSL'         => '2.098',
         'List::Compare'           => '0.55',
         'List::Util'              => '0',
         'Module::CoreList'        => '5.20260420',

@@ -554,11 +554,12 @@ subtest 'Unit test' => sub {
                     }
 
                     foreach my ( $t, $name ) ( $info->%* ) {
-                        my $TODO;
-                        $TODO = todo 'This test fails when vercmp is not installed'
-                          if ( ( $t eq 'normal_ver' || $t =~ /\Aepoch_/ ) && !can_run('vercmp') );
-
                         subtest "$t ($name)" => sub {
+                            my $TODO;
+
+                            $TODO = todo 'This test fails when vercmp is not installed'
+                              if ( ( $t eq 'normal_ver' || $t =~ /\Aepoch_/ ) && !can_run('vercmp') );
+
                             my $c2a = App::cpan2arch->new;
                             $c2a->_process_opts( [ qw< --update >, $FAKE{mod} ] );
 
@@ -600,7 +601,7 @@ subtest 'Unit test' => sub {
                             }
                             else {
                                 if ( $t eq 'normal_comp' ) {
-                                    my $TODO = todo 'This test fails when TTY width x height is smaller than 199x40';
+                                    $TODO = todo 'This test fails when TTY width x height is smaller than 199x40';
 
                                     test_diff(
                                         $stderr, $comparison,

@@ -198,14 +198,14 @@ subtest 'Unit test' => sub {
 
             foreach my ( $t, $name ) (%TESTS_FILES) {
                 subtest "$t ($name)" => sub {
+                    my $TODO;
                     my $c2a = App::cpan2arch->new;
 
                     $c2a->_init_muac;
 
                     if ( $t =~ /\Abogus_/ ) {
-                        if ( $t eq 'bogus_tar' ) {
-                            my $TODO = todo 'This test fails when IO::Uncompress::UnXz is installed';
-                        }
+                        $TODO = todo 'This test fails when IO::Uncompress::UnXz is installed'
+                          if $t eq 'bogus_tar';
 
                         my ( $stderr, @ret ) = capture_stderr {
                             return $c2a->_find_files( $DIST, $name );

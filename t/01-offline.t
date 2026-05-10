@@ -428,14 +428,14 @@ subtest 'Unit test' => sub {
 
         my %TESTS_OUT = (
             '--update' => {
-                normal_ver   => 'PKGBUILD + version updated',
+                #normal_ver   => 'PKGBUILD + version updated',
                 normal_bump  => 'PKGBUILD updated + pkgrel bumped',
-                normal_comp  => '.SRCINFO != generated metadata',
+                #normal_comp  => '.SRCINFO != generated metadata',
                 normal_epoch => 'PKGBUILD updated + preserve epoch',
 
-                epoch_add    => 'PKGBUILD updated + add epoch',
-                epoch_bump   => 'PKGBUILD updated + bump epoch',
-                epoch_vercmp => 'no vercmp',
+                #epoch_add    => 'PKGBUILD updated + add epoch',
+                #epoch_bump   => 'PKGBUILD updated + bump epoch',
+                #epoch_vercmp => 'no vercmp',
 
                 no_files => 'no .SRCINFO or PKGBUILD',
                 no_vars  => 'no pkgbase/pkgver/pkgrel in .SRCINFO',

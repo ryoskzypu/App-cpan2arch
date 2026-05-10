@@ -129,8 +129,6 @@ method _get_muac ($type)
 
     return undef if $type ne 'mcpan' && $type ne 'arch';
 
-    local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
-
     # Silence logger
     $logger = Mojo::Log->new( path => '/dev/null' ) unless $env{debug};
 
@@ -182,6 +180,9 @@ method _get_module ($module)
 
     my $res = do {
         try {
+            my %env = $self->env;
+            local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
+
             $_muac->get($url)->result;
         }
         catch ($e) {
@@ -225,6 +226,9 @@ method _get_release ($dist)
 
     my $res = do {
         try {
+            my %env = $self->env;
+            local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
+
             $_muac->get($url)->result;
         }
         catch ($e) {
@@ -272,6 +276,9 @@ method _find_files ( $dist, $download_url )
 
     my $res = do {
         try {
+            my %env = $self->env;
+            local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
+
             $_muac->get($download_url)->result;
         }
         catch ($e) {

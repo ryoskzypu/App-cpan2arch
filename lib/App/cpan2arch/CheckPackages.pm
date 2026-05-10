@@ -658,6 +658,9 @@ method _get_json ($url)
 
         $res = do {
             try {
+                my %env = $self->env;
+                local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
+
                 $muac->get($url)->result;
             }
             catch ($e) {

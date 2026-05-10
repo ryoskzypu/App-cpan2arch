@@ -240,6 +240,9 @@ method _fetch (@prereqs)
     my $prog = $self->prog;
     my $muac = $self->_get_muac('mcpan');
 
+    my %env = $self->env;
+    local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
+
     # Fetch three dists at a time using the download_url endpoint.
     #
     # References:

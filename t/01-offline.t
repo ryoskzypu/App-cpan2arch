@@ -430,7 +430,7 @@ subtest 'Unit test' => sub {
             '--update' => {
                 #normal_ver   => 'PKGBUILD + version updated',
                 normal_bump  => 'PKGBUILD updated + pkgrel bumped',
-                #normal_comp  => '.SRCINFO != generated metadata',
+                normal_comp  => '.SRCINFO != generated metadata',
                 normal_epoch => 'PKGBUILD updated + preserve epoch',
 
                 #epoch_add    => 'PKGBUILD updated + add epoch',

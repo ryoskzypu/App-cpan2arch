@@ -203,7 +203,8 @@ If true, disables the cache for HTTP requests. Default: C<false>.
 
 =item B<C2A_DEBUG>
 
-If true, displays debug information to C<STDERR>. Default: C<false>.
+If true, displays debug information to C<STDERR> (Requires L<Data::Printer>).
+Default: C<false>.
 
 =back
 

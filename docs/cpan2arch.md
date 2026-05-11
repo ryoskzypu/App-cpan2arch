@@ -160,7 +160,8 @@ Note that [Getopt::Long::More](https://metacpan.org/pod/Getopt%3A%3ALong%3A%3AMo
 
 - **C2A\_DEBUG**
 
-    If true, displays debug information to `STDERR`. Default: `false`.
+    If true, displays debug information to `STDERR` (Requires [Data::Printer](https://metacpan.org/pod/Data%3A%3APrinter)).
+    Default: `false`.
 
 # BUGS
 

@@ -9,7 +9,7 @@ use Object::Pad 0.825;
 package App::cpan2arch::GetMetadata;  # For toolchain compatibility.
 role App::cpan2arch::GetMetadata;
 
-use File::Spec::Functions qw< splitdir >;
+use File::Spec::Functions qw< catdir splitdir >;
 use Scalar::Util          qw< looks_like_number >;
 
 our $VERSION = 'v1.0.0';
@@ -320,7 +320,12 @@ method _find_files ( $dist, $download_url )
 
         foreach my $f (@tar_files) {
             if ( $f->is_file ) {
-                my @dirs = splitdir( $f->name );
+                my $path =
+                  $f->prefix ne ''
+                  ? catdir( $f->prefix, $f->name )
+                  : $f->name;
+
+                my @dirs = splitdir($path);
 
                 # Only top level license files.
                 if ( scalar @dirs == 2 ) {
@@ -332,10 +337,10 @@ method _find_files ( $dist, $download_url )
                     }
                 }
                 elsif ( scalar @dirs == 4 ) {
-                    my $mi = Path::Tiny::path( $dirs[0] )->child( qw< inc Module Install.pm > );
+                    my $mi = catdir( $dirs[0], qw< inc Module Install.pm > );
 
                     # ../inc/Module/Install.pm
-                    if ( $f->name eq $mi->stringify ) {
+                    if ( $f->name eq $mi ) {
                         $files{mi} = true;
                         $self->_pdbg("found Install.pm\n");
                     }
@@ -359,7 +364,12 @@ method _find_files ( $dist, $download_url )
         # XS
         foreach my $f (@tar_files) {
             if ( $f->is_file ) {
-                my @dirs = splitdir( $f->name );
+                my $path =
+                  $f->prefix ne ''
+                  ? catdir( $f->prefix, $f->name )
+                  : $f->name;
+
+                my @dirs = splitdir($path);
 
                 if ( scalar @dirs ) {
                     # Ignore irrelevant dirs.

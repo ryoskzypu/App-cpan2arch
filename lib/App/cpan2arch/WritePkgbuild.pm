@@ -191,8 +191,8 @@ method _get_pkgbuild_vars ()
         dist     => $meta{dist},
         pkgver   => $meta{version},
         pkgdesc  => do {
-            # Escape single quotes with ANSI-C quoting.
-            my $desc = $meta{abstract} =~ s{'}{\\'}gr;
+            # Trim + escape single quotes with ANSI-C quoting.
+            my $desc = trim( $meta{abstract} =~ s{'}{\\'}gr );
             $desc =~ /'/ ? qq{\$'$desc'} : qq{'$desc'};
         },
         arch => $meta{has_xs}

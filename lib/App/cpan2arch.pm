@@ -64,7 +64,10 @@ method _process_env ()
     $_env{debug}            = $ENV{C2A_DEBUG}        ? true : false;
 
     try {
-        require Data::Printer if $_env{debug};
+        if ( $_env{debug} ) {
+            require Data::Printer;
+            Data::Printer->VERSION('1.002001');
+        }
     }
     catch ($e) {
         warn $e;

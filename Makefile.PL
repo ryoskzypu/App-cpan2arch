@@ -87,13 +87,13 @@ my %WriteMakefileArgs = (
             },
             runtime => {
                 recommends => {
-                    'Data::Printer'      => '0',
+                    'Data::Printer'      => '1.002001',
                     'Getopt::Long::More' => '0.007',
                 },
             },
             test => {
                 recommends => {
-                    'Data::Printer' => '0',
+                    'Data::Printer' => '1.002001',
                 },
             },
         },

@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 
 use v5.42.0;
 

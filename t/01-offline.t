@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 #
 # Test every offline App::cpan2arch component to ensure correct behavior.
 # App::cpan2arch must run as documented in its POD (and its wrapper POD).

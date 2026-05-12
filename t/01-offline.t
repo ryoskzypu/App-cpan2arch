@@ -15,7 +15,7 @@ use v5.42.0;
 use strict;
 use warnings;
 
-use Test2::V1 qw<
+use Test2::V1 -utf8, qw<
     fail
     is
     isa_ok

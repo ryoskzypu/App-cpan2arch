@@ -8,7 +8,7 @@ use warnings;
 use Exporter qw< import >;
 our @EXPORT_OK = qw< expected_data test_diff >;
 
-use Test2::V1 qw<
+use Test2::V1 -utf8, qw<
     fail
     note
     pass

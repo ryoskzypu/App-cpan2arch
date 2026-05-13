@@ -1133,6 +1133,92 @@ Takes no arguments and returns C<self>.
 
 Takes no arguments and returns C<0> on success.
 
+=head2 PKGBUILD EXAMPLE
+
+=for highlighter language=bash
+
+  # Maintainer: Your Name <email@domain.tld>
+
+  _author=RYOSKZYPU
+  _dist=App-cpan2arch
+  pkgname=perl-${_dist@L}
+  pkgver=v1.0.0
+  pkgrel=1
+  pkgdesc='generate PKGBUILD from CPAN metadata'
+  arch=('any')
+  url=https://metacpan.org/dist/$_dist
+  license=('MIT-0')
+  depends=(
+      'perl-archive-tar'
+      'perl-capture-tiny>=0.50'
+      'perl-chi>=0.61'
+      'perl-cpanel-json-xs>=4.40'
+      'perl-devel-checkbin>=0.04'
+      'perl-encode'
+      'perl-encode-locale>=1.05'
+      'perl-io-socket-ssl>=2.098'
+      'perl-list-compare>=0.55'
+      'perl-module-corelist>=5.20260420'
+      'perl-mojo-useragent-cached>=1.25'  # Package for Mojo::UserAgent::Cached is missing.
+      'perl-mojolicious'
+      'perl-object-pad>=0.825'
+      'perl-path-tiny>=0.150'
+      'perl-pathtools'
+      'perl-pod-usage'
+      'perl-scalar-list-utils'
+      'perl-software-license>=0.104007'
+      'perl-term-readkey>=2.38'
+      'perl-term-table'
+      'perl-time-piece'
+      'perl-version>=0.9934'
+      'perl>=5.42.0'
+  )
+  makedepends=('perl-extutils-makemaker')
+  checkdepends=(
+      'perl-capture-tiny>=0.50'
+      'perl-devel-checkbin>=0.04'
+      'perl-path-tiny>=0.150'
+      'perl-test-simple'
+      'perl-text-diff>=1.45'
+  )
+  optdepends=(
+      'perl-data-printer>=1.002001'
+      'perl-getopt-long-more>=0.007'  # Package for Getopt::Long::More is missing.
+  )
+  options=('!emptydirs')
+  source=("https://cpan.metacpan.org/authors/id/${_author::1}/${_author::2}/$_author/$_dist-$pkgver.tar.gz")
+  sha256sums=('9bdd428eb2afc2f836216ad79afd9ebf2b935201be3067da11044b3b740f096f')
+
+  build()
+  {
+      cd "$_dist-$pkgver"
+
+      unset PERL_MM_OPT PERL5LIB PERL_LOCAL_LIB_ROOT
+      export PERL_MM_USE_DEFAULT=1
+
+      /usr/bin/perl Makefile.PL NO_PACKLIST=1 NO_PERLLOCAL=1
+      make
+  }
+
+  check()
+  {
+      cd "$_dist-$pkgver"
+
+      unset PERL5LIB PERL_LOCAL_LIB_ROOT
+
+      make test
+  }
+
+  package()
+  {
+      cd "$_dist-$pkgver"
+
+      unset PERL5LIB PERL_LOCAL_LIB_ROOT
+
+      make install INSTALLDIRS=vendor DESTDIR="$pkgdir"
+      install -Dm644 LICENSE -t "$pkgdir/usr/share/licenses/$pkgname/"
+  }
+
 =head1 BUGS
 
 Report bugs at L<https://github.com/ryoskzypu/App-cpan2arch/issues>.

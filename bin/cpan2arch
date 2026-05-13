@@ -54,6 +54,8 @@ and other issues are added as comments in the C<PKGBUILD> to inform the packager
 The generated C<PKGBUILD> follows L<Perl package guidelines|https://wiki.archlinux.org/title/Perl_package_guidelines>
 and is printed to C<STDOUT> by default, unless B<--update> or B<--write> is passed.
 
+See L<App::cpan2arch::WritePkgbuild/"PKGBUILD EXAMPLE">.
+
 =head2 NOTE
 
 This tool is intended to ease the maintenance of Perl packages through automation,

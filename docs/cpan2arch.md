@@ -45,6 +45,8 @@ and other issues are added as comments in the `PKGBUILD` to inform the packager.
 The generated `PKGBUILD` follows [Perl package guidelines](https://wiki.archlinux.org/title/Perl_package_guidelines)
 and is printed to `STDOUT` by default, unless **--update** or **--write** is passed.
 
+See ["PKGBUILD EXAMPLE" in App::cpan2arch::WritePkgbuild](https://metacpan.org/pod/App%3A%3Acpan2arch%3A%3AWritePkgbuild#PKGBUILD-EXAMPLE).
+
 ## NOTE
 
 This tool is intended to ease the maintenance of Perl packages through automation,

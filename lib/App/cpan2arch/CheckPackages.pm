@@ -649,7 +649,11 @@ method _postproc_prereqs (%prereqs)
 
                 if ( exists $optionals{$module} ) {
                     foreach my $desc ( $optionals{$module}->@* ) {
-                        $desc =~ s{'}{\\'}g;
+                        # Massage desc
+                        # https://man.archlinux.org/man/alpm-package-relation.7.en#Optional_dependency:~:text=Note
+                        $desc = trim($desc)
+                          =~ s{\v}{; }gr
+                          =~ s{'}{\\'}gr;
 
                         my $opt = "$pkg: $desc";
                         push_pkg($opt);

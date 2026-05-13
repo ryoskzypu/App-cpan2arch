@@ -165,7 +165,7 @@ Note that [Getopt::Long::More](https://metacpan.org/pod/Getopt%3A%3ALong%3A%3AMo
 
 # BUGS
 
-Report bugs at [https://github.com/author/App-cpan2arch/issues](https://github.com/author/App-cpan2arch/issues).
+Report bugs at [https://github.com/ryoskzypu/App-cpan2arch/issues](https://github.com/ryoskzypu/App-cpan2arch/issues).
 
 # AUTHOR
 

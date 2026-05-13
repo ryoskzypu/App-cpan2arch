@@ -25,24 +25,59 @@ method check_packages ()
 {
     $self->_psub;
 
-    my %QUERIES = (
-        perl     => 'https://archlinux.org/packages/core/x86_64/perl/json/',
-        official => 'https://archlinux.org/packages/search/json/?q=perl-&repo=Core&repo=Extra',
-        aur      => 'https://aur.archlinux.org/rpc/v5/search/perl-?by=name',
+    # Query Arch's perl pkg and Official + AUR Perl pkgs in bulk.
+    my $perl;
+    my %pkgs = (
+        official => undef,
+        aur      => undef,
     );
-    my %json;
+    {
+        my %QUERIES = (
+            perl     => 'https://archlinux.org/packages/core/x86_64/perl/json/',
+            official => 'https://archlinux.org/packages/search/json/?q=perl-&repo=Core&repo=Extra',
+            aur      => 'https://aur.archlinux.org/rpc/v5/search/perl-?by=name',
+        );
 
-    foreach my $q ( keys %QUERIES ) {
-        $json{$q} = $self->_get_json( $QUERIES{$q} );
-        $self->_pdump( '$q', \$q, "\n" );
+        my %json = (
+            perl     => undef,
+            official => undef,
+            aur      => undef,
+        );
 
-        return 1 if $json{$q} == 1;
+        foreach my $q ( keys %QUERIES ) {
+            $self->_pdump( '$q', \$q, "\n" );
+
+            $json{$q} = $self->_get_json( $QUERIES{$q} );
+            return 1 if $json{$q} == 1;
+
+            if ( $q eq 'perl' ) {
+                $perl = $json{perl};
+            }
+            elsif ( $q eq 'official' ) {
+                $pkgs{official} = [ $json{official}{results}->@* ];
+
+                foreach my $page ( 2 .. $json{official}{num_pages} ) {
+                    my $url = $QUERIES{official} . "&page=$page";
+
+                    my $j = $self->_get_json($url);
+                    return 1 if $j == 1;
+
+                    push $pkgs{official}->@*, $j->{results}->@*;
+                }
+            }
+            elsif ( $q eq 'aur' ) {
+                $pkgs{aur} = [ $json{aur}{results}->@* ];
+            }
+        }
+
+        #$self->_pdump('$perl', \$perl, '');
+        #$self->_pdump('%pkgs', \%pkgs, "\n");
     }
 
-    my $core_modules = $self->_get_corelist( $json{perl}{pkgver} );
+    my $core_modules = $self->_get_corelist( $perl->{pkgver} );
     return 1 if $core_modules == 1;
 
-    my $prereqs = $self->_preproc_prereqs( $core_modules, %json );
+    my $prereqs = $self->_preproc_prereqs( $core_modules, $perl, %pkgs );
     return 1 if $prereqs == 1;
 
     $self->_postproc_prereqs( $prereqs->%* );
@@ -51,7 +86,7 @@ method check_packages ()
 }
 
 # Pre-process prerequisites while checking for Arch packages.
-method _preproc_prereqs ( $core_modules, %json )
+method _preproc_prereqs ( $core_modules, $perl, %pkgs )
 {
     $self->_psub;
 
@@ -157,7 +192,7 @@ method _preproc_prereqs ( $core_modules, %json )
 
                 $prereqs{$var}{perl} = {
                     version   => $version,
-                    flag_date => _fmt_date( $json{perl}{flag_date}, 'official' ),
+                    flag_date => _fmt_date( $perl->{flag_date}, 'official' ),
                 };
 
                 $self->_pdbg("\n\n");
@@ -228,7 +263,7 @@ method _preproc_prereqs ( $core_modules, %json )
                 }
 
                 # Dist exists in the perl package provides array.
-                if ( any { /\A \Q$pkg\E (?> = [0-9._]+ )?\z/x } $json{perl}{provides}->@* ) {
+                if ( any { /\A \Q$pkg\E (?> = [0-9._]+ )?\z/x } $perl->{provides}->@* ) {
                     $prereqs{$var}{$pkg}{version} = $version;
                     $prereqs{$var}{$pkg}{module}  = $module if $var eq 'optdepends';
                     $seen_pkgs{$pkg}              = {};
@@ -373,7 +408,7 @@ method _preproc_prereqs ( $core_modules, %json )
                 {
                     my $pkg;
 
-                    foreach my $res ( $json{official}{results}->@* ) {
+                    foreach my $res ( $pkgs{official}->@* ) {
                         if ( defined $pkg_single && $res->{pkgname} eq $pkg_single ) {
                             $pkg = $pkg_single;
                         }
@@ -409,11 +444,13 @@ method _preproc_prereqs ( $core_modules, %json )
                 }
                 next if $found;
 
-                # Arch's Official repo web API is limited to 250 packages on bulk
-                # searches, so try an individual search.
+                # Try an individual search.
+
+                # perl-* pkgs were already searched in bulk.
+                my @exact_pkgs = grep { !/\Aperl-/ } @pkgs;
 
                 # Exact pkgname search
-                foreach my $pkg (@pkgs) {
+                foreach my $pkg (@exact_pkgs) {
                     my $query = "https://archlinux.org/packages/search/json/?name=$pkg&repo=Core&repo=Extra";
 
                     my $json = $self->_get_json($query);
@@ -458,7 +495,7 @@ method _preproc_prereqs ( $core_modules, %json )
                 {
                     my $pkg;
 
-                    foreach my $res ( $json{aur}{results}->@* ) {
+                    foreach my $res ( $pkgs{aur}->@* ) {
                         if ( defined $pkg_single && $res->{PackageBase} eq $pkg_single ) {
                             $pkg = $pkg_single;
                         }

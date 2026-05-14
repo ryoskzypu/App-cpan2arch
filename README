@@ -12,6 +12,8 @@ and other issues are added as comments in the "PKGBUILD" to inform the packager.
 The generated "PKGBUILD" follows Perl package guidelines and is printed to
 "STDOUT" by default, unless --update or --write is passed.
 
+See "PKGBUILD EXAMPLE" in App::cpan2arch::WritePkgbuild.
+
 NOTE
 
 This tool is intended to ease the maintenance of Perl packages through

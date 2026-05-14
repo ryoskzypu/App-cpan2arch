@@ -4,6 +4,7 @@ v1.0.1    2026-05-14T00:40:43Z
           - Query all perl-* pages from Arch's Official API rather than only the
             first page, reducing individual API searches and network IO
             (real time improvement of ~40% in PKGBUILD generation + online tests!)
+          - Trim whitespace + remove newlines from optdepends descriptions
           - Fix missing author in GH issues link
           - Add PKGBUILD example in documentation
 

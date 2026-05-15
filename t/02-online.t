@@ -436,8 +436,9 @@ subtest 'Unit test' => sub {
 
             my %TESTS_CORE = (
                 'normal'      => 'v5.6.0',
+                'newer'       => '999',
+                'bogus_ver'   => 'v5.42.x',
                 'bogus_newer' => '999',
-                'bogus_undef' => undef,
             );
 
             foreach my ( $t, $name ) (%TESTS_CORE) {
@@ -447,6 +448,8 @@ subtest 'Unit test' => sub {
                     my $c2a = App::cpan2arch->new;
 
                     if ( $t =~ /\Abogus_/ ) {
+                        local $] = $name;
+
                         my ( $stderr, @ret ) = capture_stderr {
                             return $c2a->_get_corelist($name);
                         };

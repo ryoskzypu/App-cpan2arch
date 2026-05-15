@@ -749,21 +749,38 @@ method _get_corelist ($ver)
 {
     $self->_psub;
 
+    my $prog = $self->prog;
+
     # NOTE:
-    #   Module::CoreList version must support the current perl package version,
-    #   so the minimum required version has to be kept updated.
+    #   Ideally, M::CoreList should always support the current perl pkg version,
+    #   but its min required version would have to be kept updated, so just fallback
+    #   to the current perl version if perl pkg version is not found in M::CoreList.
+    #   This might lead to the generated PKGBUILD miss core modules (Arch users
+    #   will have latest perl anyways).
     require Module::CoreList;
 
-    my $perl_cur_ver = $];
-    my $perl_pkg_ver = version->new($ver)->numify;
+    my $perl_pkg_ver = do {
+        try {
+            version->parse($ver)->numify;
 
-    my $prog = $self->prog;
+        }
+        catch ($e) {
+            warn $e;
+            warn "$prog: failed to parse $ver version\n";
+
+            return 1;
+        }
+    };
+
+    my $perl_cur_ver = $];
 
     if ( $perl_pkg_ver > $perl_cur_ver ) {
         $self->_pdbg("perl package version ($perl_pkg_ver) is newer than the current perl version ($perl_cur_ver)\n");
     }
 
     my $core_modules = Module::CoreList->find_version($perl_pkg_ver);
+    $core_modules = Module::CoreList->find_version($perl_cur_ver)  # Fallback
+      unless defined $core_modules;
     #$self->_pdump('$core_modules', $core_modules, "\n");
 
     if ( !defined $core_modules ) {

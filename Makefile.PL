@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
         'IO::Socket::SSL'         => '2.098',
         'List::Compare'           => '0.55',
         'List::Util'              => '0',
-        'Module::CoreList'        => '5.20260420',
+        'Module::CoreList'        => '0',
         'Mojo::Log'               => '0',
         'Mojo::Promise'           => '0',
         'Mojo::UserAgent::Cached' => '1.25',
@@ -52,7 +52,7 @@ my %WriteMakefileArgs = (
         'Term::ReadKey'           => '2.38',
         'Term::Table'             => '0',
         'Time::Piece'             => '0',
-        'version'                 => '0.9934',
+        'version'                 => '0',
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

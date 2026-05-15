@@ -16,7 +16,7 @@ class App::cpan2arch
 use File::Basename qw< basename >;
 use Encode         qw< decode >;
 use Encode::Locale 1.05;
-use version 0.9934;
+use version;
 
 our $VERSION = 'v1.0.1';
 

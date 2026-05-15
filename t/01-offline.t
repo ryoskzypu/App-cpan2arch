@@ -516,30 +516,41 @@ subtest 'Unit test' => sub {
                     my $PROG = path($0)->basename;
 
                     # Expected metadata comparison
-                    # (Table generated from 199x40 TTY)
                     my $comparison = <<~"END";
                         $PROG: .SRCINFO is different than generated metadata
 
                         Metadata comparison
-                        +--------------+------------------------------------+------------------------------------+------------------------+
-                        | Variable     | .SRCINFO                           | Generated                          | Status                 |
-                        +--------------+------------------------------------+------------------------------------+------------------------+
-                        | sha256sums   | N/A                                | -                                  | Missing from .SRCINFO  |
-                        | checkdepends | -                                  | N/A                                | Missing from Generated |
-                        | md5sums      | -                                  | N/A                                | Missing from Generated |
-                        | checkdepends | perl-test-simple                   | -                                  | Only in .SRCINFO       |
-                        |              |                                    |                                    |                        |
-                        | depends      | perl-capture-tiny, perl-list-compa | -                                  | Only in .SRCINFO       |
-                        |              | re                                 |                                    |                        |
-                        |              |                                    |                                    |                        |
-                        | md5sums      | 65b0f7984e0c176dcd640973a8fb6581   | -                                  | Only in .SRCINFO       |
-                        | depends      | -                                  | perl-test-simple                   | Only in Generated      |
-                        |              |                                    |                                    |                        |
-                        | sha256sums   | -                                  | db096cf2e0e1e6127dacc40be6fbd526aa | Only in Generated      |
-                        |              |                                    | 5ad41886a5bae00f4fe6a53a6c6ffb     |                        |
-                        |              |                                    |                                    |                        |
-                        | pkgdesc      | Bogus abstract                     | Visually debug regexes in-place    | Differs                |
-                        +--------------+------------------------------------+------------------------------------+------------------------+
+                        +--------------+-------------------+-------------------+-------------------+
+                        | Variable     | .SRCINFO          | Generated         | Status            |
+                        +--------------+-------------------+-------------------+-------------------+
+                        | sha256sums   | N/A               | -                 | Missing from .SRC |
+                        |              |                   |                   | INFO              |
+                        |              |                   |                   |                   |
+                        | checkdepends | -                 | N/A               | Missing from Gene |
+                        |              |                   |                   | rated             |
+                        |              |                   |                   |                   |
+                        | md5sums      | -                 | N/A               | Missing from Gene |
+                        |              |                   |                   | rated             |
+                        |              |                   |                   |                   |
+                        | checkdepends | perl-test-simple  | -                 | Only in .SRCINFO  |
+                        |              |                   |                   |                   |
+                        | depends      | perl-capture-tiny | -                 | Only in .SRCINFO  |
+                        |              | , perl-list-compa |                   |                   |
+                        |              | re                |                   |                   |
+                        |              |                   |                   |                   |
+                        | md5sums      | 65b0f7984e0c176dc | -                 | Only in .SRCINFO  |
+                        |              | d640973a8fb6581   |                   |                   |
+                        |              |                   |                   |                   |
+                        | depends      | -                 | perl-test-simple  | Only in Generated |
+                        |              |                   |                   |                   |
+                        | sha256sums   | -                 | db096cf2e0e1e6127 | Only in Generated |
+                        |              |                   | dacc40be6fbd526aa |                   |
+                        |              |                   | 5ad41886a5bae00f4 |                   |
+                        |              |                   | fe6a53a6c6ffb     |                   |
+                        |              |                   |                   |                   |
+                        | pkgdesc      | Bogus abstract    | Visually debug re | Differs           |
+                        |              |                   | gexes in-place    |                   |
+                        +--------------+-------------------+-------------------+-------------------+
                         END
 
                     # Expected updated PKGBUILD
@@ -601,7 +612,7 @@ subtest 'Unit test' => sub {
                             }
                             else {
                                 if ( $t eq 'normal_comp' ) {
-                                    $TODO = todo 'This test fails when TTY width x height is smaller than 199x40';
+                                    $TODO = todo 'This test fails when TTY width is not 80';
 
                                     test_diff(
                                         $stderr, $comparison,

@@ -238,7 +238,7 @@ method _fetch (@prereqs)
     require Mojo::Promise;
 
     my $prog = $self->prog;
-    my $muac = $self->_get_muac('mcpan');
+    my $muac = $self->muac_mcpan;
 
     my %env = $self->env;
     local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};

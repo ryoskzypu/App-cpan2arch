@@ -210,9 +210,9 @@ subtest 'Unit test' => sub {
             foreach my ( $t, $name ) (%TESTS_FILES) {
                 subtest "$t ($name)" => sub {
                     my $TODO;
-                    my $c2a = App::cpan2arch->new;
 
-                    $c2a->_init_muac;
+                    my $c2a = App::cpan2arch->new;
+                    $c2a->_init_muac_mcpan;
 
                     if ( $t =~ /\Abogus_/ ) {
                         $TODO = todo 'This test fails when IO::Uncompress::UnXz is installed'
@@ -259,6 +259,7 @@ subtest 'Unit test' => sub {
                 my ( $env, $cache_path ) = get_env_cache( $t, 'mcpan_cache' );
                 $c2a->set_env( $env->%* );
 
+                $c2a->_init_muac_mcpan;
                 $c2a->set_meta( $expected->{$DIST}{meta}->%* );
 
                 if ( $t eq 'bogus_url' ) {
@@ -405,7 +406,7 @@ subtest 'Unit test' => sub {
             foreach my ( $t, $name ) (%TESTS_JSON) {
                 subtest "$t ($name)" => sub {
                     my $c2a = App::cpan2arch->new;
-
+                    $c2a->_init_muac_arch;
                     $c2a->set_env(%env);
 
                     if ( $t =~ /\Abogus_/ ) {

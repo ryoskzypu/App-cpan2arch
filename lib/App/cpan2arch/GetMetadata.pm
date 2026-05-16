@@ -14,7 +14,7 @@ use Scalar::Util          qw< looks_like_number >;
 
 our $VERSION = 'v1.0.1';
 
-field $_muac;
+field $_muac_mcpan   :reader;
 field $_mod_endpoint :reader :writer = 'https://fastapi.metacpan.org/v1/module/';
 field $_rel_endpoint :reader :writer = 'https://fastapi.metacpan.org/v1/release/';
 field %_optionals    :reader;
@@ -28,7 +28,7 @@ method get_metadata ()
 {
     $self->_psub;
 
-    $self->_init_muac;
+    $self->_init_muac_mcpan;
 
     # Get the module/distribution and its release.
     my $dist;
@@ -105,11 +105,11 @@ method get_metadata ()
     return 0;
 }
 
-method _init_muac ()
+method _init_muac_mcpan ()
 {
     $self->_psub;
 
-    $_muac = $self->_get_muac('mcpan');
+    $_muac_mcpan = $self->_get_muac('mcpan');
 
     return $self;
 }
@@ -183,7 +183,7 @@ method _get_module ($module)
             my %env = $self->env;
             local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
 
-            $_muac->get($url)->result;
+            $_muac_mcpan->get($url)->result;
         }
         catch ($e) {
             warn $e;
@@ -229,7 +229,7 @@ method _get_release ($dist)
             my %env = $self->env;
             local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
 
-            $_muac->get($url)->result;
+            $_muac_mcpan->get($url)->result;
         }
         catch ($e) {
             warn $e;
@@ -279,7 +279,7 @@ method _find_files ( $dist, $download_url )
             my %env = $self->env;
             local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
 
-            $_muac->get($download_url)->result;
+            $_muac_mcpan->get($download_url)->result;
         }
         catch ($e) {
             warn $e;

@@ -11,7 +11,7 @@ role App::cpan2arch::CheckPackages;
 
 use List::Util qw< any uniq >;
 
-our $VERSION = 'v1.0.1';
+our $VERSION = 'v1.0.2';
 
 field $_muac_arch;
 field %_arch_prereqs :reader :writer;

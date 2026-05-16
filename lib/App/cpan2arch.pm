@@ -18,7 +18,7 @@ use Encode         qw< decode >;
 use Encode::Locale 1.05;
 use version;
 
-our $VERSION = 'v1.0.1';
+our $VERSION = 'v1.0.2';
 
 field $_prog :reader = basename($0);
 field %_env  :reader :writer = (

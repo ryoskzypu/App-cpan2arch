@@ -12,7 +12,7 @@ role App::cpan2arch::MergePrereqs;
 use Scalar::Util qw< looks_like_number >;
 use List::Util   qw< any >;
 
-our $VERSION = 'v1.0.1';
+our $VERSION = 'v1.0.2';
 
 field $_dl_endpoint  :reader :writer = 'https://fastapi.metacpan.org/v1/download_url/';
 field %_cpan_prereqs :reader :writer;
@@ -237,8 +237,8 @@ method _fetch (@prereqs)
 
     require Mojo::Promise;
 
-    my $prog = $self->prog;
-    my $muac = $self->muac_mcpan;
+    my $prog       = $self->prog;
+    my $muac_mcpan = $self->muac_mcpan;
 
     my %env = $self->env;
     local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
@@ -260,7 +260,7 @@ method _fetch (@prereqs)
             $query  = 'version=' . $version if $version;       # Ignore 0 versions.
             $url   .= '?' . $query          if defined $query;
 
-            $muac->get_p($url);
+            $muac_mcpan->get_p($url);
         },
         @prereqs,
       )

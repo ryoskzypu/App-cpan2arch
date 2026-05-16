@@ -406,8 +406,8 @@ subtest 'Unit test' => sub {
             foreach my ( $t, $name ) (%TESTS_JSON) {
                 subtest "$t ($name)" => sub {
                     my $c2a = App::cpan2arch->new;
-                    $c2a->_init_muac_arch;
                     $c2a->set_env(%env);
+                    $c2a->_init_muac_arch;
 
                     if ( $t =~ /\Abogus_/ ) {
                         my ( $stderr, @ret ) = capture_stderr {

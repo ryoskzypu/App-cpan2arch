@@ -179,7 +179,7 @@ Note that L<Getopt::Long::More> is required.
 
 =over 4
 
-=item B<C2A_PACKAGER>
+=item B<PACKAGER>
 
 If set, overrides the default packager attribution info. Default: C<< Your Name <email@domain.tld> >>.
 

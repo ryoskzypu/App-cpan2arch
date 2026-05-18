@@ -136,7 +136,7 @@ Note that [Getopt::Long::More](https://metacpan.org/pod/Getopt%3A%3ALong%3A%3AMo
 
 # ENVIRONMENT
 
-- **C2A\_PACKAGER**
+- **PACKAGER**
 
     If set, overrides the default packager attribution info. Default: `Your Name <email@domain.tld>`.
 

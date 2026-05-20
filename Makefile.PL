@@ -30,7 +30,6 @@ my %WriteMakefileArgs = (
         'Archive::Tar'            => '0',
         'CHI'                     => '0.61',
         'Capture::Tiny'           => '0.50',
-        'Cpanel::JSON::XS'        => '4.40',
         'Devel::CheckBin'         => '0.04',
         'Encode'                  => '0',
         'Encode::Locale'          => '1.05',
@@ -87,6 +86,7 @@ my %WriteMakefileArgs = (
             },
             runtime => {
                 recommends => {
+                    'Cpanel::JSON::XS'   => '4.40',
                     'Data::Printer'      => '1.002001',
                     'Getopt::Long::More' => '0.007',
                 },

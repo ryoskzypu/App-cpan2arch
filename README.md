@@ -28,6 +28,15 @@ external libraries or even have wrong metadata, thus
 [manual inspection](https://wiki.archlinux.org/title/AUR_submission_guidelines#Maintaining_packages)
 is always advised.
 
+## OPTIONAL DEPENDENCIES
+
+The following modules are highly recommended for performance but not required:
+
+- [Mojo::UserAgent::Cached](https://metacpan.org/pod/Mojo%3A%3AUserAgent%3A%3ACached) + [CHI](https://metacpan.org/pod/CHI)
+
+    Enables caching of HTTP requests to MetaCPAN and Arch Linux APIs. This speeds up
+    repeated queries and reduces server load.
+
 ## Installation
 
 To download and install this module directly with [cpanminus](https://metacpan.org/pod/App::cpanminus):

@@ -21,6 +21,14 @@ automation, but blindly relying on it is not recommended since distributions
 might depend on external libraries or even have wrong metadata, thus manual
 inspection is always advised.
 
+OPTIONAL DEPENDENCIES
+
+The following modules are highly recommended for performance but not required:
+
+    Mojo::UserAgent::Cached + CHI
+        Enables caching of HTTP requests to MetaCPAN and Arch Linux APIs.
+        This speeds up repeated queries and reduces server load.
+
 
 INSTALLATION
 

@@ -14,8 +14,6 @@ class App::cpan2arch
   :does(App::cpan2arch::WritePkgbuild);
 
 use File::Basename qw< basename >;
-use Encode         qw< decode >;
-use Encode::Locale 1.05;
 use version;
 
 our $VERSION = 'v1.0.2';
@@ -89,9 +87,6 @@ method _process_opts ( $argv = undef )
 
     return 0 unless defined $argv;
 
-    # Decode program arguments as locale encoding.
-    my @args = map { decode( locale => $_, 1 ) } $argv->@*;
-
     # Transform Getopt::Long error warns.
     local $SIG{__WARN__} = sub {
         chomp( my $msg = shift );
@@ -133,7 +128,7 @@ method _process_opts ( $argv = undef )
     }
 
     GetOptionsFromArray(
-        \@args,
+        $argv,
         'w|write'     => \$_opts{write},
         'force'       => \$_opts{force},
         'u|update'    => \$_opts{update},
@@ -148,8 +143,8 @@ method _process_opts ( $argv = undef )
 
     ) or return 2;
 
-    $_args{module}  = shift @args;
-    $_args{version} = shift @args;
+    $_args{module}  = shift $argv->@*;
+    $_args{version} = shift $argv->@*;
 
     $self->_pdump( '%_opts', \%_opts, "\n" );
     $self->_pdump( '%_args', \%_args, "\n" );

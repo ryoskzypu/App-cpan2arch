@@ -48,7 +48,6 @@ my %WriteMakefileArgs = (
         'Pod::Usage'              => '0',
         'Scalar::Util'            => '0',
         'Software::LicenseUtils'  => '0.104007',
-        'Term::ReadKey'           => '2.38',
         'Term::Table'             => '0',
         'Time::Piece'             => '0',
         'version'                 => '0',
@@ -89,6 +88,7 @@ my %WriteMakefileArgs = (
                     'Cpanel::JSON::XS'   => '4.40',
                     'Data::Printer'      => '1.002001',
                     'Getopt::Long::More' => '0.007',
+                    'Term::ReadKey'      => '2.38',
                 },
             },
             test => {

@@ -125,6 +125,8 @@ Example:
   | pkgdesc      | Bogus abstract   | Visually debug regexes in-place | Differs                |
   +--------------+------------------+---------------------------------+------------------------+
 
+The table width defaults to 80, unless L<Term::ReadKey> is installed.
+
 =item *
 
 B<--write> and B<--force> are implied.

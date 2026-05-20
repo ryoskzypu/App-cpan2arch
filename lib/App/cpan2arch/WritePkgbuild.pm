@@ -876,9 +876,6 @@ method write_pkgbuild ()
 
             require Term::Table;
 
-            require Term::ReadKey;  # Get TTY width for the table.
-            Term::ReadKey->VERSION('2.38');
-
             my %compare_data = (
                 missing => {
                     meta_a => undef,

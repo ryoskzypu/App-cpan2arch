@@ -95,6 +95,8 @@ is always advised.
         +--------------+------------------+---------------------------------+------------------------+
         ```
 
+        The table width defaults to 80, unless [Term::ReadKey](https://metacpan.org/pod/Term%3A%3AReadKey) is installed.
+
     - **--write** and **--force** are implied.
     - To only update `pkgver`, `pkgrel`,
     and `sha256sums`, use [`pkgctl version upgrade`](https://man.archlinux.org/man/extra/devtools/pkgctl-version-upgrade.1),

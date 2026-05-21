@@ -16,7 +16,7 @@ class App::cpan2arch
 use File::Basename qw< basename >;
 use version;
 
-our $VERSION = 'v1.0.2';
+our $VERSION = 'v1.1.0';
 
 field $_prog :reader = basename($0);
 field %_env  :reader :writer = (

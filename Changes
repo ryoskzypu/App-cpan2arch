@@ -1,5 +1,17 @@
 Revision history for App::cpan2arch
 
+v1.1.0    2026-05-21T09:14:02Z
+          - Be more lightweight, so make caching as optional and move M::UA::C +
+            CHI to runtime recommends
+          - Remove unnecessary Encode + Encode::Locale because cpan2arch does no
+            Unicode manipulation in @ARGV
+          - Move Cpanel::JSON::XS to runtime recommends since there's no real time
+            gain (Mojo::JSON suffices)
+          - Move Term::ReadKey to runtime recommends + document, so one can choose
+            whether a larger table is desired
+          - Remove lexical var dupe (CheckPackages.pm)
+          - Fix wrong PACKAGER environment var in documentation
+
 v1.0.2    2026-05-16T01:21:00Z
           - Initialize M::UA::C's mcpan + arch instances only one time, so --clear
             is consistent and cache is not cleared multiple times. It seems there

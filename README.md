@@ -9,8 +9,7 @@
 [MetaCPAN API](https://github.com/metacpan/metacpan-api) to fetch metadata and
 the [Official repositories web interface](https://wiki.archlinux.org/title/Official_repositories_web_interface)
 \+ [Aurweb RPC interface](https://wiki.archlinux.org/title/Aurweb_RPC_interface)
-for Arch Linux packages information, using caching to speed up repeated requests
-and reduce server load.
+for Arch Linux packages information.
 
 Warnings about flagged out-of-date packages, missing packages, license problems,
 and other issues are added as comments in the `PKGBUILD` to inform the packager.
@@ -20,7 +19,7 @@ and is printed to `STDOUT` by default, unless **--update** or **--write** is pas
 
 See ["PKGBUILD EXAMPLE" in App::cpan2arch::WritePkgbuild](https://metacpan.org/pod/App%3A%3Acpan2arch%3A%3AWritePkgbuild#PKGBUILD-EXAMPLE).
 
-## NOTE
+## Note
 
 This tool is intended to ease the maintenance of Perl packages through automation,
 but blindly relying on it is not recommended since distributions might depend on
@@ -28,7 +27,7 @@ external libraries or even have wrong metadata, thus
 [manual inspection](https://wiki.archlinux.org/title/AUR_submission_guidelines#Maintaining_packages)
 is always advised.
 
-## OPTIONAL DEPENDENCIES
+## Optional dependencies
 
 The following modules are highly recommended for performance but not required:
 

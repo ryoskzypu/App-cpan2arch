@@ -3,8 +3,7 @@ App::cpan2arch
 cpan2arch is a command-line utility that generates an Arch Linux "PKGBUILD"
 based on module/distribution metadata. It relies on the MetaCPAN API to fetch
 metadata and the Official repositories web interface + Aurweb RPC interface for
-Arch Linux packages information, using caching to speed up repeated requests and
-reduce server load.
+Arch Linux packages information.
 
 Warnings about flagged out-of-date packages, missing packages, license problems,
 and other issues are added as comments in the "PKGBUILD" to inform the packager.

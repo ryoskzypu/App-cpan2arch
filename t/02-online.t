@@ -26,23 +26,15 @@ use Test2::V1 -utf8, qw<
     todo
 >;
 
-use lib 't/lib';
-use TestData qw< expected_data test_diff >;
-use App::cpan2arch;
-
-use Capture::Tiny 0.50 qw< capture capture_stderr >;
-use Path::Tiny 0.150;
-
 skip_all('Set RELEASE_TESTING=1 to run online tests')
   unless $ENV{RELEASE_TESTING};
 
-# Defaults
-my %DEFS = (
-    class => 'App::cpan2arch',
-    ver   => $App::cpan2arch::VERSION,
-);
+use lib 't/lib';
+use TestData qw< expected_data test_diff >;
 
-my $expected = expected_data();
+use App::cpan2arch;
+use Capture::Tiny 0.50 qw< capture capture_stderr >;
+use Path::Tiny 0.150;
 
 my $has_cache_mods = do {
     try {
@@ -56,6 +48,14 @@ my $has_cache_mods = do {
         undef;
     }
 };
+
+my $expected = expected_data();
+
+# Defaults
+my %DEFS = (
+    class => 'App::cpan2arch',
+    ver   => $App::cpan2arch::VERSION,
+);
 
 # Unit test methods not covered in offline tests:
 #   get_metadata()

@@ -29,14 +29,16 @@ use Test2::V1 -utf8, qw<
 
 use lib 't/lib';
 use TestData qw< expected_data test_diff >;
-use App::cpan2arch;
 
+use App::cpan2arch;
 use builtin qw< is_bool >;
 use Capture::Tiny 0.50 qw< capture_stdout capture_stderr >;
 use Path::Tiny 0.150;
 use Devel::CheckBin 0.04;
 
 no warnings qw< experimental::builtin >;
+
+my $expected = expected_data();
 
 # Defaults
 my %DEFS = (
@@ -50,8 +52,6 @@ my %FAKE = (
     dist => 'Foo-Bar',
     ver  => 'v2.0.0',
 );
-
-my $expected = expected_data();
 
 # Unit test each method separately.
 subtest 'Unit test' => sub {

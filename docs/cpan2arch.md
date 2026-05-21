@@ -36,8 +36,7 @@ $ cpan2arch -w Foo-Bar v1.0.0  # Dist + version
 [MetaCPAN API](https://github.com/metacpan/metacpan-api) to fetch metadata and
 the [Official repositories web interface](https://wiki.archlinux.org/title/Official_repositories_web_interface)
 \+ [Aurweb RPC interface](https://wiki.archlinux.org/title/Aurweb_RPC_interface)
-for Arch Linux packages information, using caching to speed up repeated requests
-and reduce server load.
+for Arch Linux packages information.
 
 Warnings about flagged out-of-date packages, missing packages, license problems,
 and other issues are added as comments in the `PKGBUILD` to inform the packager.
@@ -54,6 +53,15 @@ but blindly relying on it is not recommended since distributions might depend on
 external libraries or even have wrong metadata, thus
 [manual inspection](https://wiki.archlinux.org/title/AUR_submission_guidelines#Maintaining_packages)
 is always advised.
+
+## OPTIONAL DEPENDENCIES
+
+The following modules are highly recommended for performance but not required:
+
+- [Mojo::UserAgent::Cached](https://metacpan.org/pod/Mojo%3A%3AUserAgent%3A%3ACached) + [CHI](https://metacpan.org/pod/CHI)
+
+    Enables caching of HTTP requests to MetaCPAN and Arch Linux APIs. This speeds up
+    repeated queries and reduces server load.
 
 # OPTIONS
 

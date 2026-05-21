@@ -13,7 +13,7 @@ use List::Util qw< any uniq >;
 
 our $VERSION = 'v1.0.2';
 
-field $_muac_arch;
+field $_mua_arch;
 field %_arch_prereqs :reader :writer;
 
 # Check whether prerequisite dists exist as packages in Arch's Official/AUR repos
@@ -26,7 +26,7 @@ method check_packages ()
 {
     $self->_psub;
 
-    $self->_init_muac_arch;
+    $self->_init_mua_arch;
 
     # Query Arch's perl pkg and Official + AUR Perl pkgs in bulk.
     my $perl;
@@ -687,11 +687,11 @@ method _postproc_prereqs (%prereqs)
     return $self;
 }
 
-method _init_muac_arch ()
+method _init_mua_arch ()
 {
     $self->_psub;
 
-    $_muac_arch = $self->_get_muac('arch');
+    $_mua_arch = $self->_get_mua('arch');
 
     return $self;
 }
@@ -713,7 +713,7 @@ method _get_json ($url)
                 my %env = $self->env;
                 local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
 
-                $_muac_arch->get($url)->result;
+                $_mua_arch->get($url)->result;
             }
             catch ($e) {
                 warn $e;

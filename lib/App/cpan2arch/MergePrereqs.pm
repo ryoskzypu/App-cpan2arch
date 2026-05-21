@@ -238,7 +238,7 @@ method _fetch (@prereqs)
     require Mojo::Promise;
 
     my $prog       = $self->prog;
-    my $muac_mcpan = $self->muac_mcpan;
+    my $mua_mcpan = $self->mua_mcpan;
 
     my %env = $self->env;
     local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
@@ -260,7 +260,7 @@ method _fetch (@prereqs)
             $query  = 'version=' . $version if $version;       # Ignore 0 versions.
             $url   .= '?' . $query          if defined $query;
 
-            $muac_mcpan->get_p($url);
+            $mua_mcpan->get_p($url);
         },
         @prereqs,
       )

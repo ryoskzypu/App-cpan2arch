@@ -44,6 +44,19 @@ my %DEFS = (
 
 my $expected = expected_data();
 
+my $has_cache_mods = do {
+    try {
+        require Mojo::UserAgent::Cached;
+        Mojo::UserAgent::Cached->VERSION('1.25');
+
+        require CHI;
+        CHI->VERSION('0.61');
+    }
+    catch ($e) {
+        undef;
+    }
+};
+
 # Unit test methods not covered in offline tests:
 #   get_metadata()
 #   merge_prereqs()
@@ -102,11 +115,16 @@ subtest 'Unit test' => sub {
             );
 
             foreach my ( $t, $name ) (%TESTS_META) {
+                next if $t =~ /\Ano_cache/ && !$has_cache_mods;
+
                 subtest "$t ($name)" => sub {
                     my $c2a = App::cpan2arch->new;
+                    my $cache_path;
 
-                    my ( $env, $cache_path ) = get_env_cache( $t, 'mcpan_cache' );
-                    $c2a->set_env( $env->%* );
+                    if ($has_cache_mods) {
+                        ( my $env, $cache_path ) = get_env_cache( $t, 'mcpan_cache' );
+                        $c2a->set_env( $env->%* );
+                    }
 
                     my @argv = $name;
                     push @argv, $VER if $t eq 'normal_dist' || $t eq 'no_cache_dist';
@@ -138,31 +156,33 @@ subtest 'Unit test' => sub {
                     my %meta      = $c2a->meta;
 
                     # Cache
-                    if ( $t =~ /\Ano_cache_/ ) {
-                        is(
-                            !-d $cache_path, T(),
-                            'has no cache',
-                        );
-                    }
-                    else {
-                        my @caches = path($cache_path)->child('Default')->children;
-                        #system( 'tree', '-a', $cache_path );
+                    if ($has_cache_mods) {
+                        if ( $t =~ /\Ano_cache_/ ) {
+                            is(
+                                !-d $cache_path, T(),
+                                'has no cache',
+                            );
+                        }
+                        else {
+                            my @caches = path($cache_path)->child('Default')->children;
+                            #system( 'tree', '-a', $cache_path );
 
-                        is(
-                            scalar @caches, number_gt(0),
-                            'has cache',
-                        );
+                            is(
+                                scalar @caches, number_gt(0),
+                                'has cache',
+                            );
 
-                        # Clear cache
-                        $c2a->_process_opts( [ qw< --clear >, $DIST ] );
-                        $c2a->_get_muac('mcpan');
-                        my @cl_caches = path($cache_path)->children;
-                        #system( 'tree', '-a', $cache_path );
+                            # Clear cache
+                            $c2a->_process_opts( [ qw< --clear >, $DIST ] );
+                            $c2a->_get_mua('mcpan');
+                            my @cl_caches = path($cache_path)->children;
+                            #system( 'tree', '-a', $cache_path );
 
-                        is(
-                            scalar @caches, number_gt( scalar @cl_caches ),
-                            'has cleared cache',
-                        );
+                            is(
+                                scalar @caches, number_gt( scalar @cl_caches ),
+                                'has cleared cache',
+                            );
+                        }
                     }
 
                     # Module (normal_mod) only fetches the latest release, so it cannot
@@ -212,7 +232,7 @@ subtest 'Unit test' => sub {
                     my $TODO;
 
                     my $c2a = App::cpan2arch->new;
-                    $c2a->_init_muac_mcpan;
+                    $c2a->_init_mua_mcpan;
 
                     if ( $t =~ /\Abogus_/ ) {
                         $TODO = todo 'This test fails when IO::Uncompress::UnXz is installed'
@@ -253,13 +273,18 @@ subtest 'Unit test' => sub {
         );
 
         foreach my ( $t, $name ) (%TESTS_MERGE) {
+            next if $t eq 'no_cache' && !$has_cache_mods;
+
             subtest "$t ($name)" => sub {
                 my $c2a = App::cpan2arch->new;
+                my $cache_path;
 
-                my ( $env, $cache_path ) = get_env_cache( $t, 'mcpan_cache' );
-                $c2a->set_env( $env->%* );
+                if ($has_cache_mods) {
+                    ( my $env, $cache_path ) = get_env_cache( $t, 'mcpan_cache' );
+                    $c2a->set_env( $env->%* );
+                }
 
-                $c2a->_init_muac_mcpan;
+                $c2a->_init_mua_mcpan;
                 $c2a->set_meta( $expected->{$DIST}{meta}->%* );
 
                 if ( $t eq 'bogus_url' ) {
@@ -286,29 +311,31 @@ subtest 'Unit test' => sub {
                 my $ret          = $c2a->merge_prereqs;
                 my %cpan_prereqs = $c2a->cpan_prereqs;
 
-                if ( $t eq 'no_cache' ) {
-                    is(
-                        !-d $cache_path, T(),
-                        'has no cache',
-                    );
-                }
-                else {
-                    my @caches = path($cache_path)->child('Default')->children;
+                if ($has_cache_mods) {
+                    if ( $t eq 'no_cache' ) {
+                        is(
+                            !-d $cache_path, T(),
+                            'has no cache',
+                        );
+                    }
+                    else {
+                        my @caches = path($cache_path)->child('Default')->children;
 
-                    is(
-                        scalar @caches, number_gt(0),
-                        'has cache',
-                    );
+                        is(
+                            scalar @caches, number_gt(0),
+                            'has cache',
+                        );
 
-                    # Clear cache
-                    $c2a->_process_opts( [ qw< --clear-mcpan >, $DIST ] );
-                    $c2a->_get_muac('mcpan');
-                    my @cl_caches = path($cache_path)->children;
+                        # Clear cache
+                        $c2a->_process_opts( [ qw< --clear-mcpan >, $DIST ] );
+                        $c2a->_get_mua('mcpan');
+                        my @cl_caches = path($cache_path)->children;
 
-                    is(
-                        scalar @caches, number_gt( scalar @cl_caches ),
-                        'has cleared cache',
-                    );
+                        is(
+                            scalar @caches, number_gt( scalar @cl_caches ),
+                            'has cleared cache',
+                        );
+                    }
                 }
 
                 is(
@@ -338,40 +365,47 @@ subtest 'Unit test' => sub {
             );
 
             foreach my ( $t, $name ) (%TESTS_PKGS) {
+                next if $t eq 'no_cache' && !$has_cache_mods;
+
                 subtest "$t ($name)" => sub {
                     my $c2a = App::cpan2arch->new;
+                    my $cache_path;
 
-                    my ( $env, $cache_path ) = get_env_cache( $t, 'arch_cache' );
-                    $c2a->set_env( $env->%* );
+                    if ($has_cache_mods) {
+                        ( my $env, $cache_path ) = get_env_cache( $t, 'arch_cache' );
+                        $c2a->set_env( $env->%* );
+                    }
 
                     $c2a->set_cpan_prereqs( $expected->{$DIST}{cpan_prereqs}->%* );
 
                     my $ret          = $c2a->check_packages;
                     my %arch_prereqs = $c2a->arch_prereqs;
 
-                    if ( $t eq 'no_cache' ) {
-                        is(
-                            !-d $cache_path, T(),
-                            'has no cache',
-                        );
-                    }
-                    else {
-                        my @caches = path($cache_path)->child('Default')->children;
+                    if ($has_cache_mods) {
+                        if ( $t eq 'no_cache' ) {
+                            is(
+                                !-d $cache_path, T(),
+                                'has no cache',
+                            );
+                        }
+                        else {
+                            my @caches = path($cache_path)->child('Default')->children;
 
-                        is(
-                            scalar @caches, number_gt(0),
-                            'has cache',
-                        );
+                            is(
+                                scalar @caches, number_gt(0),
+                                'has cache',
+                            );
 
-                        # Clear cache
-                        $c2a->_process_opts( [ qw< --clear-arch >, $DIST ] );
-                        $c2a->_get_muac('arch');
-                        my @cl_caches = path($cache_path)->children;
+                            # Clear cache
+                            $c2a->_process_opts( [ qw< --clear-arch >, $DIST ] );
+                            $c2a->_get_mua('arch');
+                            my @cl_caches = path($cache_path)->children;
 
-                        is(
-                            scalar @caches, number_gt( scalar @cl_caches ),
-                            'has cleared cache',
-                        );
+                            is(
+                                scalar @caches, number_gt( scalar @cl_caches ),
+                                'has cleared cache',
+                            );
+                        }
                     }
 
                     is(
@@ -407,7 +441,7 @@ subtest 'Unit test' => sub {
                 subtest "$t ($name)" => sub {
                     my $c2a = App::cpan2arch->new;
                     $c2a->set_env(%env);
-                    $c2a->_init_muac_arch;
+                    $c2a->_init_mua_arch;
 
                     if ( $t =~ /\Abogus_/ ) {
                         my ( $stderr, @ret ) = capture_stderr {

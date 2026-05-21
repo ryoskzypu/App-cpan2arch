@@ -14,7 +14,7 @@ use Scalar::Util          qw< looks_like_number >;
 
 our $VERSION = 'v1.0.2';
 
-field $_muac_mcpan   :reader;
+field $_mua_mcpan    :reader;
 field $_mod_endpoint :reader :writer = 'https://fastapi.metacpan.org/v1/module/';
 field $_rel_endpoint :reader :writer = 'https://fastapi.metacpan.org/v1/release/';
 field %_optionals    :reader;
@@ -28,7 +28,7 @@ method get_metadata ()
 {
     $self->_psub;
 
-    $self->_init_muac_mcpan;
+    $self->_init_mua_mcpan;
 
     # Get the module/distribution and its release.
     my $dist;
@@ -105,69 +105,96 @@ method get_metadata ()
     return 0;
 }
 
-method _init_muac_mcpan ()
+method _init_mua_mcpan ()
 {
     $self->_psub;
 
-    $_muac_mcpan = $self->_get_muac('mcpan');
+    $_mua_mcpan = $self->_get_mua('mcpan');
 
     return $self;
 }
 
-# Create a Mojo::UserAgent::Cached instance.
-method _get_muac ($type)
+# Create a Mojo::UserAgent instance.
+method _get_mua ($type)
 {
-    # Lazy-load to improve startup time.
-    require Mojo::UserAgent::Cached;
-    Mojo::UserAgent::Cached->VERSION('1.25');
+    return undef if $type ne 'mcpan' && $type ne 'arch';
 
-    require Mojo::Log;
+    # Caching support
+    my $has_muac = do {
+        try {
+            require Mojo::UserAgent::Cached;
+            Mojo::UserAgent::Cached->VERSION('1.25');
+        }
+        catch ($e) {
+            # Use Mojo::UA as fallback.
+            require Mojo::UserAgent;
+
+            $self->_pdbg("Mojo::UserAgent::Cached is not installed\n\n");
+            undef;
+        }
+    };
+    my $has_chi = do {
+        if ( defined $has_muac ) {
+            try {
+                require CHI;
+                CHI->VERSION('0.61');
+            }
+            catch ($e) {
+                $self->_pdbg("CHI is not installed\n\n");
+                undef;
+            }
+        }
+    };
 
     my %env  = $self->env;
     my %opts = $self->opts;
-    my $logger;
+    my $mua;
 
-    return undef if $type ne 'mcpan' && $type ne 'arch';
+    if ( defined $has_muac && defined $has_chi ) {
+        require Mojo::Log;
 
-    # Silence logger
-    $logger = Mojo::Log->new( path => '/dev/null' ) unless $env{debug};
+        # Silence logger
+        my $logger;
+        $logger = Mojo::Log->new( path => '/dev/null' ) unless $env{debug};
 
-    my $muac = Mojo::UserAgent::Cached->new(
-        $env{debug}
-        ? ()
-        : ( logger => $logger ),
-    );
-    $muac->transactor->name( $env{user_agent} );
+        $mua = Mojo::UserAgent::Cached->new(
+            $env{debug}
+            ? ()
+            : ( logger => $logger ),
+        );
+        $mua->transactor->name( $env{user_agent} );
 
-    # Use CHI as the cache backend.
-    {
-        require CHI;
-        CHI->VERSION('0.61');
+        # Use CHI as the cache backend.
+        {
+            my $path =
+                $type eq 'mcpan'
+              ? $env{cache_mcpan_path}
+              : $env{cache_arch_path};
 
-        my $path =
-            $type eq 'mcpan'
-          ? $env{cache_mcpan_path}
-          : $env{cache_arch_path};
+            my $chi;
 
-        my $chi;
+            $chi = CHI->new(
+                driver     => 'File',
+                root_dir   => $path,
+                expires_in => $env{cache_expiration},
+            ) unless $env{cache_ignore};
 
-        $chi = CHI->new(
-            driver     => 'File',
-            root_dir   => $path,
-            expires_in => $env{cache_expiration},
-        ) unless $env{cache_ignore};
+            if ( defined $chi ) {
+                $chi->clear
+                  if defined $opts{clear}
+                  || ( $type eq 'mcpan' && defined $opts{clear_mcpan} )
+                  || ( $type eq 'arch'  && defined $opts{clear_arch} );
+            }
 
-        if ( defined $chi ) {
-            $chi->clear
-              if defined $opts{clear}
-              || ( $type eq 'mcpan' && defined $opts{clear_mcpan} )
-              || ( $type eq 'arch'  && defined $opts{clear_arch} );
+            $mua->cache_agent($chi) unless $env{cache_ignore};
         }
-
-        $muac->cache_agent($chi) unless $env{cache_ignore};
+    }
+    else {
+        $mua = Mojo::UserAgent->new;
+        $mua->transactor->name( $env{user_agent} );
     }
 
-    return $muac;
+    return $mua;
 }
 
 method _get_module ($module)
@@ -183,7 +210,7 @@ method _get_module ($module)
             my %env = $self->env;
             local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
 
-            $_muac_mcpan->get($url)->result;
+            $_mua_mcpan->get($url)->result;
         }
         catch ($e) {
             warn $e;
@@ -229,7 +256,7 @@ method _get_release ($dist)
             my %env = $self->env;
             local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
 
-            $_muac_mcpan->get($url)->result;
+            $_mua_mcpan->get($url)->result;
         }
         catch ($e) {
             warn $e;
@@ -279,7 +306,7 @@ method _find_files ( $dist, $download_url )
             my %env = $self->env;
             local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
 
-            $_muac_mcpan->get($download_url)->result;
+            $_mua_mcpan->get($download_url)->result;
         }
         catch ($e) {
             warn $e;

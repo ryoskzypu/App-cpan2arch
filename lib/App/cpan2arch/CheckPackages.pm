@@ -534,11 +534,6 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
 
                 # Exact PackageBase search
                 {
-                    # AUR JSON already covers all ~2k perl-* packages, so no need
-                    # to redo the search.
-                    my @exact_pkgs = grep { !/\Aperl-/ } @pkgs;
-                    last unless scalar @exact_pkgs;
-
                     my $query = 'https://aur.archlinux.org/rpc/v5/info?';
 
                     # Construct multiple arg packages in a single query.

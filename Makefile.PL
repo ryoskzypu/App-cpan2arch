@@ -38,6 +38,7 @@ my %WriteMakefileArgs = (
         'Module::CoreList'       => '0',
         'Mojo::Log'              => '0',
         'Mojo::Promise'          => '0',
+        'Mojo::UserAgent'        => '0',
         'Mojolicious'            => '9.45',
         'Object::Pad'            => '0.825',
         'Path::Tiny'             => '0.150',
@@ -91,7 +92,9 @@ my %WriteMakefileArgs = (
             },
             test => {
                 recommends => {
-                    'Data::Printer' => '1.002001',
+                    'CHI'                     => '0.61',
+                    'Data::Printer'           => '1.002001',
+                    'Mojo::UserAgent::Cached' => '1.25',
                 },
             },
         },

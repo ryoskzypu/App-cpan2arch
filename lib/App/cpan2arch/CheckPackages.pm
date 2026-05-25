@@ -517,7 +517,7 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
                             $found = is_aur_pkg($res) if $pkg !~ /\Aperl-/;
 
                             if ($found) {
-                                $version =~ s{\Av}{} if $version =~ /\Av/ && $res->{Version} !~ /\Av/;
+                                $version =~ s{\Av}{} if $version =~ /\Av/ && $res->{Version} !~ /\A(?> [0-9]+:)?v/x;
                                 my $date = _fmt_date( $res->{OutOfDate}, 'aur' );
 
                                 $prereqs{$var}{$pkg} = {
@@ -561,7 +561,7 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
                         $found = is_aur_pkg($res) if $pkg !~ /\Aperl-/;
 
                         if ($found) {
-                            $version =~ s{\Av}{} if $version =~ /\Av/ && $res->{Version} !~ /\Av/;
+                            $version =~ s{\Av}{} if $version =~ /\Av/ && $res->{Version} !~ /\A(?> [0-9]+:)?v/x;
                             my $date = _fmt_date( $res->{OutOfDate}, 'aur' );
 
                             $prereqs{$var}{$pkg} = {

@@ -21,6 +21,10 @@ my %DISTS = (
         version => '1.16',
         note    => 'EU::MM; PP; Alien dist; dup. prereqs/pkgs; unusual license (deprecated)',
     },
+    'App-cpm' => {
+        version => 'v1.1.1',
+        note    => q{M::B::T; PP; flagged OOD pkgs (AUR); pkgs with epoch + 'v' prefix (AUR)},
+    },
     'Data-Dump-Streamer' => {
         version => '2.42',
         note    => 'M::B; XS; no perl in depends + perl in makedepends',
@@ -327,6 +331,287 @@ my %EXPECTED = (
                 unset PERL5LIB PERL_LOCAL_LIB_ROOT
 
                 make install INSTALLDIRS=vendor DESTDIR="$pkgdir"
+            }
+            END
+    },
+    'App-cpm' => {
+        meta => {
+            abstract   => 'a fast CPAN module installer',
+            author     => 'SKAJI',
+            checksum   => 'd3ce2020167e7e0a185880421abaee2adab5e4378424cb24b5ce11d4a45bf208',
+            dependency => [
+                {
+                    module       => 'CPAN::Mirror::Tiny',
+                    phase        => 'develop',
+                    relationship => 'requires',
+                    version      => '0.20',
+                },
+                {
+                    module       => 'Path::Tiny',
+                    phase        => 'develop',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'local::lib',
+                    phase        => 'develop',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Archive::Tar',
+                    phase        => 'develop',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Capture::Tiny',
+                    phase        => 'develop',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Archive::Zip',
+                    phase        => 'develop',
+                    relationship => 'requires',
+                    version      => '1.68',
+                },
+                {
+                    module       => 'Carton',
+                    phase        => 'runtime',
+                    relationship => 'recommends',
+                    version      => '0',
+                },
+                {
+                    module       => 'File::pushd',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'File::Copy::Recursive',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'ExtUtils::Config',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Module::cpmfile',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => 'v1.0.0',
+                },
+                {
+                    module       => 'CPAN::DistnameInfo',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'File::Which',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Parse::LocalDistribution',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0.20',
+                },
+                {
+                    module       => 'Darwin::InitObjC',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => 'v1.0.0',
+                },
+                {
+                    module       => 'Command::Runner',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => 'v1.0.0',
+                },
+                {
+                    module       => 'Parallel::Pipes::App',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => 'v1.0.0',
+                },
+                {
+                    module       => 'perl',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => 'v5.24.0',
+                },
+                {
+                    module       => 'ExtUtils::Install',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '2.20',
+                },
+                {
+                    module       => 'HTTP::Tinyish',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0.12',
+                },
+                {
+                    module       => 'Module::CPANfile',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'IPC::Run3',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'ExtUtils::InstallPaths',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0.002',
+                },
+                {
+                    module       => 'ExtUtils::Helpers',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Proc::ForkSafe',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => 'v1.0.0',
+                },
+                {
+                    module       => 'CPAN::02Packages::Search',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => 'v1.0.0',
+                },
+                {
+                    module       => 'perl',
+                    phase        => 'configure',
+                    relationship => 'requires',
+                    version      => 'v5.24.0',
+                },
+                {
+                    module       => 'Module::Build::Tiny',
+                    phase        => 'configure',
+                    relationship => 'requires',
+                    version      => '0.051',
+                },
+            ],
+            dist               => 'App-cpm',
+            download_url       => 'https://cpan.metacpan.org/authors/id/S/SK/SKAJI/App-cpm-v1.1.1.tar.gz',
+            has_license        => 'LICENSE',
+            has_module_install => false,
+            has_multi_licenses => false,
+            has_xs             => false,
+            license            => ['perl_5'],
+            name               => 'App-cpm-v1.1.1',
+            spdx_expression    => 'Artistic-1.0-Perl OR GPL-1.0-or-later',
+            version            => 'v1.1.1',
+        },
+        arch_prereqs => {
+            depends => [
+                'perl-command-runner>=v1.0.0',
+                'perl-cpan-02packages-search>=v1.0.0',
+                'perl-cpan-distnameinfo',
+                'perl-darwin-initobjc>=v1.0.0',
+                'perl-extutils-config',
+                'perl-extutils-helpers',
+                'perl-extutils-install>=2.20',
+                'perl-extutils-installpaths>=0.002',
+                'perl-file-copy-recursive',
+                'perl-file-pushd',
+                'perl-file-which',
+                {
+                    'perl-http-tinyish>=0.12' => { flag_date => '2026-05-25' },
+                },
+                'perl-ipc-run3',
+                'perl-module-cpanfile',
+                'perl-module-cpmfile>=v1.0.0',
+                'perl-parallel-pipes>=v1.0.0',
+                'perl-parse-localdistribution>=0.20',
+                'perl-proc-forksafe>=v1.0.0',
+                'perl>=5.24.0',
+            ],
+            makedepends => ['perl-module-build-tiny>=0.051'],
+            optdepends  => ['perl-carton'],
+        },
+        pkgbuild => <<~'END',
+            # Maintainer: Your Name <email@domain.tld>
+
+            _author=SKAJI
+            _dist=App-cpm
+            pkgname=perl-${_dist@L}
+            pkgver=v1.1.1
+            pkgrel=1
+            pkgdesc='a fast CPAN module installer'
+            arch=('any')
+            url=https://metacpan.org/dist/$_dist
+            license=('Artistic-1.0-Perl OR GPL-1.0-or-later')
+            depends=(
+                'perl-command-runner>=v1.0.0'
+                'perl-cpan-02packages-search>=v1.0.0'
+                'perl-cpan-distnameinfo'
+                'perl-darwin-initobjc>=v1.0.0'
+                'perl-extutils-config'
+                'perl-extutils-helpers'
+                'perl-extutils-install>=2.20'
+                'perl-extutils-installpaths>=0.002'
+                'perl-file-copy-recursive'
+                'perl-file-pushd'
+                'perl-file-which'
+                'perl-http-tinyish>=0.12'              # Package is flagged out-of-date on 2026-05-25.
+                'perl-ipc-run3'
+                'perl-module-cpanfile'
+                'perl-module-cpmfile>=v1.0.0'
+                'perl-parallel-pipes>=v1.0.0'
+                'perl-parse-localdistribution>=0.20'
+                'perl-proc-forksafe>=v1.0.0'
+                'perl>=5.24.0'
+            )
+            makedepends=('perl-module-build-tiny>=0.051')
+            optdepends=('perl-carton')
+            options=('!emptydirs')
+            source=("https://cpan.metacpan.org/authors/id/${_author::1}/${_author::2}/$_author/$_dist-$pkgver.tar.gz")
+            sha256sums=('d3ce2020167e7e0a185880421abaee2adab5e4378424cb24b5ce11d4a45bf208')
+
+            build()
+            {
+                cd "$_dist-$pkgver"
+
+                unset PERL_MB_OPT PERL5LIB PERL_LOCAL_LIB_ROOT
+
+                /usr/bin/perl Build.PL --create_packlist=0
+                ./Build
+            }
+
+            check()
+            {
+                cd "$_dist-$pkgver"
+
+                unset PERL5LIB PERL_LOCAL_LIB_ROOT
+
+                ./Build test
+            }
+
+            package()
+            {
+                cd "$_dist-$pkgver"
+
+                unset PERL5LIB PERL_LOCAL_LIB_ROOT
+
+                ./Build install --installdirs=vendor --destdir="$pkgdir"
             }
             END
     },

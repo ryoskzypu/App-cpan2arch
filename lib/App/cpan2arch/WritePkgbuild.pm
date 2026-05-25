@@ -747,6 +747,7 @@ method write_pkgbuild ()
         # References:
         #   https://wiki.archlinux.org/title/PKGBUILD#epoch
         #   https://man.archlinux.org/man/core/pacman/PKGBUILD.5.en#:~:text=epoch
+        #   https://man.archlinux.org/man/alpm-epoch.7
         #   https://man.archlinux.org/man/vercmp.8
         #   https://gitlab.archlinux.org/pacman/pacman/-/blob/master/lib/libalpm/version.c
         my $has_epoch = false;

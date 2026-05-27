@@ -17,3 +17,4 @@ jobs:
       since-perl: 'v5.42.0'
       with-devel: true
       coverage: true
+      system-packages: 'makepkg'

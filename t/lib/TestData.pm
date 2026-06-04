@@ -4394,7 +4394,9 @@ my %EXPECTED = (
                 'perl-term-readline',
                 'perl-text-balanced>=2.01',
                 'perl-text-diff>=1.41',
-                'perl-text-findindent>=0.10',
+                {
+                    'perl-text-findindent>=0.10' => { flag_date => '2026-06-02' },
+                },
                 'perl-text-patch>=1.8',
                 'perl-threads-shared>=1.33',
                 'perl-threads>=1.71',
@@ -4408,10 +4410,10 @@ my %EXPECTED = (
                 'perl>=5.11.0',
             ],
             makedepends => [
+                'perl-alien-wxwidgets>=0.62',
                 {
-                    'perl-alien-wxwidgets>=0.62' => { flag_date => '2025-10-13' },
+                    'perl-locale-msgfmt>=0.15' => { flag_date => '2026-06-02' },
                 },
-                'perl-locale-msgfmt>=0.15',
                 'perl-module-install',
                 'perl-test-exception>=0.27',
                 'perl-test-mockobject>=1.09',
@@ -4496,7 +4498,7 @@ my %EXPECTED = (
                 'perl-term-readline'
                 'perl-text-balanced>=2.01'
                 'perl-text-diff>=1.41'
-                'perl-text-findindent>=0.10'
+                'perl-text-findindent>=0.10'         # Package is flagged out-of-date on 2026-06-02.
                 'perl-text-patch>=1.8'
                 'perl-threads-shared>=1.33'
                 'perl-threads>=1.71'
@@ -4510,8 +4512,8 @@ my %EXPECTED = (
                 'perl>=5.11.0'
             )
             makedepends=(
-                'perl-alien-wxwidgets>=0.62'  # Package is flagged out-of-date on 2025-10-13.
-                'perl-locale-msgfmt>=0.15'
+                'perl-alien-wxwidgets>=0.62'
+                'perl-locale-msgfmt>=0.15'    # Package is flagged out-of-date on 2026-06-02.
                 'perl-module-install'
                 'perl-test-exception>=0.27'
                 'perl-test-mockobject>=1.09'

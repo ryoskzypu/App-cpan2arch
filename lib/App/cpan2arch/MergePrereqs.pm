@@ -12,7 +12,7 @@ role App::cpan2arch::MergePrereqs;
 use Scalar::Util qw< looks_like_number >;
 use List::Util   qw< any >;
 
-our $VERSION = 'v1.1.1';
+our $VERSION = 'v1.1.2';
 
 field %_cpan_prereqs :reader :writer;
 field @_fetch_errors :reader;

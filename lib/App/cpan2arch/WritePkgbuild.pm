@@ -22,7 +22,7 @@ use List::Util     qw<
 
 $|++;  # Disable STDOUT buffering.
 
-our $VERSION = 'v1.1.1';
+our $VERSION = 'v1.1.2';
 
 field $_install_license;
 field %_generated_meta;

@@ -16,7 +16,7 @@ class App::cpan2arch
 use File::Basename qw< basename >;
 use version;
 
-our $VERSION = 'v1.1.1';
+our $VERSION = 'v1.1.2';
 
 field %_env :reader :writer = (
     user_agent       => "App::cpan2arch/$VERSION",

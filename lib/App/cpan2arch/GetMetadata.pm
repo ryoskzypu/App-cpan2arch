@@ -274,7 +274,7 @@ method _get_release ($dist)
         $self->_pdbg("\n");
 
         $json = $res->json;
-        $rel  = $json->{hits}{hits}[0]{_source}
+        $rel  = $json->{hits}{hits}[-1]{_source}
           if defined $json && scalar $json->{hits}{hits}->@*;
     }
 

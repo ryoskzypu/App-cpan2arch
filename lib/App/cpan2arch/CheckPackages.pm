@@ -190,7 +190,7 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
                 if ( $var eq 'makedepends' && exists $prereqs{depends}{perl} ) {
                     $self->_pdbg("perl already in depends\n");
 
-                    if ( $prereqs{depends}{perl}{version} == 0 ) {
+                    if ( $prereqs{depends}{perl}{version} eq '0' ) {
                         $self->_pdbg("\n\n");
                         next;
                     }
@@ -245,7 +245,7 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
                 if ( exists $prereqs{$var}{$pkg} ) {
                     $self->_pdbg("found var dist dupe; skip\n");
 
-                    if ( $prereqs{$var}{$pkg}{version} == 0 ) {
+                    if ( $prereqs{$var}{$pkg}{version} eq '0' ) {
                         $self->_pdbg("\n\n");
                         next;
                     }
@@ -264,7 +264,7 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
                 if ( $var eq 'makedepends' && exists $prereqs{depends}{$pkg} ) {
                     $self->_pdbg("$pkg already in depends\n");
 
-                    if ( $prereqs{depends}{$pkg}{version} == 0 ) {
+                    if ( $prereqs{depends}{$pkg}{version} eq '0' ) {
                         $self->_pdbg("\n\n");
                         next;
                     }
@@ -356,7 +356,7 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
                         $self->_pdbg("found var pkg dupe; skip\n");
                         $self->_pdump( '$pkg', \$pkg, '' );
 
-                        if ( $prereqs{$var}{$pkg}{version} == 0 ) {
+                        if ( $prereqs{$var}{$pkg}{version} eq '0' ) {
                             $self->_pdbg("\n\n");
                             last;
                         }
@@ -376,7 +376,7 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
 
                         $self->_pdbg("$pkg already in depends\n");
 
-                        if ( $prereqs{depends}{$pkg}{version} == 0 ) {
+                        if ( $prereqs{depends}{$pkg}{version} eq '0' ) {
                             $self->_pdbg("\n\n");
                             next;
                         }

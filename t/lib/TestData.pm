@@ -4336,9 +4336,7 @@ my %EXPECTED = (
                 'perl-data-dumper>=2.101',
                 'perl-dbd-sqlite>=1.35',
                 'perl-dbi>=1.58',
-                {
-                    'perl-debug-client>=0.29' => { flag_date => '2024-12-14' },
-                },
+                'perl-debug-client>=0.29',
                 'perl-devel-dumpvar>=0.04',
                 'perl-devel-refactor>=0.05',
                 'perl-encode>=2.26',
@@ -4368,9 +4366,7 @@ my %EXPECTED = (
                 'perl-module-manifest>=0.07',
                 'perl-module-starter>=1.60',
                 'perl-orlite-migrate>=1.10',
-                {
-                    'perl-orlite>=1.98' => { flag_date => '2024-11-01' },
-                },
+                'perl-orlite>=1.98',
                 'perl-params-util>=0.33',
                 'perl-parse-errorstring-perl>=0.18',
                 'perl-parse-exuberantctags>=1.00',
@@ -4446,7 +4442,7 @@ my %EXPECTED = (
                 'perl-data-dumper>=2.101'
                 'perl-dbd-sqlite>=1.35'
                 'perl-dbi>=1.58'
-                'perl-debug-client>=0.29'            # Package is flagged out-of-date on 2024-12-14.
+                'perl-debug-client>=0.29'
                 'perl-devel-dumpvar>=0.04'
                 'perl-devel-refactor>=0.05'
                 'perl-encode>=2.26'
@@ -4476,7 +4472,7 @@ my %EXPECTED = (
                 'perl-module-manifest>=0.07'
                 'perl-module-starter>=1.60'
                 'perl-orlite-migrate>=1.10'
-                'perl-orlite>=1.98'                  # Package is flagged out-of-date on 2024-11-01.
+                'perl-orlite>=1.98'
                 'perl-params-util>=0.33'
                 'perl-parse-errorstring-perl>=0.18'
                 'perl-parse-exuberantctags>=1.00'

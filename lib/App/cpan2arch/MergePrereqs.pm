@@ -87,6 +87,11 @@ method merge_prereqs ()
             if ( exists $_cpan_prereqs{$variable}{$module} ) {
                 $self->_pdbg("found dupe\n");
 
+                if ( $_cpan_prereqs{$variable}{$module}{version} == 0 ) {
+                    $self->_pdbg("\n");
+                    next;
+                }
+
                 my $ret = $self->_comp_vers( $version, $_cpan_prereqs{$variable}{$module}{version}, '>=' );
 
                 return 1 if defined $ret && $ret == 1;

@@ -190,12 +190,18 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
                 if ( $var eq 'makedepends' && exists $prereqs{depends}{perl} ) {
                     $self->_pdbg("perl already in depends\n");
 
+                    if ( $prereqs{depends}{perl}{version} == 0 ) {
+                        $self->_pdbg("\n\n");
+                        next;
+                    }
+
                     my $ret = $self->_comp_vers( $version, $prereqs{depends}{perl}{version}, '<=' );
                     return 1 if defined $ret && $ret == 1;
 
                     $prereqs{depends}{perl}{version} = $version
                       if defined $ret && $ret == 0;
 
+                    $self->_pdbg("\n");
                     next;
                 }
 
@@ -239,12 +245,18 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
                 if ( exists $prereqs{$var}{$pkg} ) {
                     $self->_pdbg("found var dist dupe; skip\n");
 
+                    if ( $prereqs{$var}{$pkg}{version} == 0 ) {
+                        $self->_pdbg("\n\n");
+                        next;
+                    }
+
                     my $ret = $self->_comp_vers( $version, $prereqs{$var}{$pkg}{version}, '<=' );
                     return 1 if defined $ret && $ret == 1;
 
                     $prereqs{$var}{$pkg}{version} = $version
                       if defined $ret && $ret == 0;
 
+                    $self->_pdbg("\n");
                     next;
                 }
 
@@ -252,12 +264,18 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
                 if ( $var eq 'makedepends' && exists $prereqs{depends}{$pkg} ) {
                     $self->_pdbg("$pkg already in depends\n");
 
+                    if ( $prereqs{depends}{$pkg}{version} == 0 ) {
+                        $self->_pdbg("\n\n");
+                        next;
+                    }
+
                     my $ret = $self->_comp_vers( $version, $prereqs{depends}{$pkg}{version}, '<=' );
                     return 1 if defined $ret && $ret == 1;
 
                     $prereqs{depends}{$pkg}{version} = $version
                       if defined $ret && $ret == 0;
 
+                    $self->_pdbg("\n");
                     next;
                 }
 
@@ -338,12 +356,18 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
                         $self->_pdbg("found var pkg dupe; skip\n");
                         $self->_pdump( '$pkg', \$pkg, '' );
 
+                        if ( $prereqs{$var}{$pkg}{version} == 0 ) {
+                            $self->_pdbg("\n\n");
+                            last;
+                        }
+
                         my $ret = $self->_comp_vers( $version, $prereqs{$var}{$pkg}{version}, '<=' );
                         return 1 if defined $ret && $ret == 1;
 
                         $prereqs{$var}{$pkg}{version} = $version
                           if defined $ret && $ret == 0;
 
+                        $self->_pdbg("\n");
                         last;
                     }
                     # Skip duplicated package in makedepends, but get the lesser version.
@@ -352,12 +376,18 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
 
                         $self->_pdbg("$pkg already in depends\n");
 
+                        if ( $prereqs{depends}{$pkg}{version} == 0 ) {
+                            $self->_pdbg("\n\n");
+                            next;
+                        }
+
                         my $ret = $self->_comp_vers( $version, $prereqs{depends}{$pkg}{version}, '<=' );
                         return 1 if defined $ret && $ret == 1;
 
                         $prereqs{depends}{$pkg}{version} = $version
                           if defined $ret && $ret == 0;
 
+                        $self->_pdbg("\n");
                         next;
                     }
                 }

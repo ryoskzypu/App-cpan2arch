@@ -78,6 +78,10 @@ my %DISTS = (
         version => '0.002007',
         note    => 'EU::MM; PP; no license',
     },
+    'Time-ParseDate' => {
+        version => '2026.0330',
+        note    => 'M::I; PP; metadata version does not match release version',
+    },
 );
 
 my %EXPECTED = (
@@ -6390,6 +6394,108 @@ my %EXPECTED = (
 
                 unset PERL_MM_OPT PERL5LIB PERL_LOCAL_LIB_ROOT
                 export PERL_MM_USE_DEFAULT=1
+
+                /usr/bin/perl Makefile.PL NO_PACKLIST=1 NO_PERLLOCAL=1
+                make
+            }
+
+            check()
+            {
+                cd "$_dist-$pkgver"
+
+                unset PERL5LIB PERL_LOCAL_LIB_ROOT
+
+                make test
+            }
+
+            package()
+            {
+                cd "$_dist-$pkgver"
+
+                unset PERL5LIB PERL_LOCAL_LIB_ROOT
+
+                make install INSTALLDIRS=vendor DESTDIR="$pkgdir"
+            }
+            END
+    },
+    'Time-ParseDate' => {
+        meta => {
+            abstract   => 'date parsing both relative and absolute',
+            author     => 'BPS',
+            checksum   => '8465c8146bd129d3be4a402b45e1b9f9c306f42b0f58a1e507bbdbd653f253b7',
+            dependency => [
+                {
+                    module       => 'ExtUtils::MakeMaker',
+                    phase        => 'configure',
+                    relationship => 'requires',
+                    version      => '6.59',
+                },
+                {
+                    module       => 'Time::Piece',
+                    phase        => 'build',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'ExtUtils::MakeMaker',
+                    phase        => 'build',
+                    relationship => 'requires',
+                    version      => '6.59',
+                },
+                {
+                    module       => 'perl',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => 'v5.8.1',
+                },
+            ],
+            dist               => 'Time-ParseDate',
+            download_url       => 'https://cpan.metacpan.org/authors/id/B/BP/BPS/Time-ParseDate-2026.033.tar.gz',
+            has_license        => false,
+            has_module_install => true,
+            has_multi_licenses => false,
+            has_xs             => false,
+            license            => ['perl_5'],
+            name               => 'Time-ParseDate-2026.033',
+            spdx_expression    => undef,
+            version            => '2026.033',
+        },
+        arch_prereqs => {
+            depends     => ['perl>=5.8.1'],
+            makedepends => [
+                'perl-extutils-makemaker>=6.59',
+                'perl-module-install',
+                'perl-time-piece',
+            ],
+        },
+        pkgbuild => <<~'END',
+            # Maintainer: Your Name <email@domain.tld>
+
+            _author=BPS
+            _dist=Time-ParseDate
+            pkgname=perl-${_dist@L}
+            pkgver=2026.033
+            pkgrel=1
+            pkgdesc='date parsing both relative and absolute'
+            arch=('any')
+            url=https://metacpan.org/dist/$_dist
+            license=('Artistic-1.0-Perl OR GPL-1.0-or-later')
+            depends=('perl>=5.8.1')
+            makedepends=(
+                'perl-extutils-makemaker>=6.59'
+                'perl-module-install'
+                'perl-time-piece'
+            )
+            options=('!emptydirs')
+            source=("https://cpan.metacpan.org/authors/id/${_author::1}/${_author::2}/$_author/$_dist-$pkgver.tar.gz")
+            sha256sums=('8465c8146bd129d3be4a402b45e1b9f9c306f42b0f58a1e507bbdbd653f253b7')
+
+            build()
+            {
+                cd "$_dist-$pkgver"
+
+                unset PERL_MM_OPT PERL5LIB PERL_LOCAL_LIB_ROOT
+                export PERL_MM_USE_DEFAULT=1 PERL_AUTOINSTALL=--skipdeps
 
                 /usr/bin/perl Makefile.PL NO_PACKLIST=1 NO_PERLLOCAL=1
                 make

@@ -91,7 +91,7 @@ method get_metadata ()
         author             => $rel->{author},
         name               => $rel->{name},
         dist               => $rel->{distribution},
-        version            => $rel->{version},
+        version            => $rel->{name} =~ s{\A\Q$rel->{distribution}\E[-_]+}{}r,
         abstract           => $rel->{abstract},
         license            => $rel->{license},
         spdx_expression    => $rel->{metadata}{x_spdx_expression},

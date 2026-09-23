@@ -17,6 +17,7 @@ use Test2::V1 -utf8, qw<
     T
     fail
     is
+    like
     note
     number
     number_gt
@@ -209,6 +210,37 @@ subtest 'Unit test' => sub {
                     );
                 };
             }
+
+            subtest 'Unauthorized release' => sub {
+                # NOTE:
+                #   Software-License 0.104007 release is marked as unauthorized
+                #   by MetaCPAN because it ships with Software::License::ISC
+                #   (without permissions), which already exists as separate dist.
+                #
+                #   See https://github.com/metacpan/metacpan-api/blob/master/docs/indexing.md#releaseauthorized.
+                $DIST = 'Software-License';
+                $VER  = '0.104007';
+                my $rx =
+                  qr{\A[^:]+: \Q$DIST\E-\Q$VER\E release by [A-Z]+ is unauthorized\. You may want to check https://metacpan\.org/dist/\Q$DIST\E\n};
+
+                my $c2a = App::cpan2arch->new;
+                $c2a->_process_opts( [ $DIST, $VER ] );
+
+                my ( $stderr, @ret ) = capture_stderr {
+                    return $c2a->get_metadata;
+                };
+
+                like(
+                    $stderr, $rx,
+                    'STDERR match',
+                );
+
+                is(
+                    $ret[0], number(0),
+                    'return value (success)',
+                );
+            };
+
         };
 
         subtest 'Find files' => sub {

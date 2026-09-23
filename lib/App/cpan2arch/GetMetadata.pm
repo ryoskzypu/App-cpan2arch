@@ -37,6 +37,7 @@ method get_metadata ()
     my $dist;
     my $rel;
     {
+        my $prog    = $self->prog;
         my %args    = $self->args;
         my $module  = $args{module};
         my $version = $args{version};
@@ -58,6 +59,11 @@ method get_metadata ()
 
         $rel = $self->_get_release($dist);
         return 1 if $rel == 1;
+
+        if ( !$rel->{authorized} ) {
+            warn "$prog: $rel->{name} release by $rel->{author} is unauthorized."
+              . " You may want to check https://metacpan.org/dist/$dist\n";
+        }
 
         $self->_pdbg("Release\n");
         $self->_pdump( '$rel', \$rel, "\n" );
@@ -237,7 +243,7 @@ method _get_module ($module)
 }
 
 # References:
-#   https://blogs.perl.org/users/neilb/2016/12/working-with-the-metacpan-api.html.
+#   https://blogs.perl.org/users/neilb/2016/12/working-with-the-metacpan-api.html
 method _get_release ($dist)
 {
     $self->_psub;

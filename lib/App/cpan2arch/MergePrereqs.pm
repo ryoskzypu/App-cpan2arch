@@ -107,13 +107,17 @@ method merge_prereqs ()
     }
 
     # Optionals must not exist in other variable phases.
-    foreach my $opt ( keys $_cpan_prereqs{optdepends}->%* ) {
+    foreach my ( $mod, $info ) ( $_cpan_prereqs{optdepends}->%* ) {
+        next if !defined $info->{dist} || $info->{dist} eq 'perl';
+
         foreach my ( $var, $deps ) (%_cpan_prereqs) {
             next if $var eq 'optdepends';
 
-            if ( exists $_cpan_prereqs{$var}{$opt} ) {
-                delete $_cpan_prereqs{optdepends}{$opt};
-                $self->_pdbg("$opt exists outside of optdepends\n\n");
+            foreach my ( $m, $i ) ( $deps->%* ) {
+                if ( $i->{dist} eq $info->{dist} ) {
+                    delete $_cpan_prereqs{optdepends}{$mod};
+                    $self->_pdbg("$info->{dist} exists outside of optdepends\n\n");
+                }
             }
         }
     }

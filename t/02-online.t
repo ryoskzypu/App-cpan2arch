@@ -69,7 +69,7 @@ my %DEFS = (
 #
 #   Mocks are out of scope for this test, which only covers the real APIs.
 subtest 'Unit test' => sub {
-    #skip_all;
+    # skip_all;
 
     # Tests need to set a proper C2A environment + temporary cache.
     my sub get_env_cache ( $t, $path )
@@ -94,10 +94,10 @@ subtest 'Unit test' => sub {
     }
 
     subtest 'Metadata' => sub {
-        #skip_all;
+        # skip_all;
 
         subtest 'Get metadata' => sub {
-            #skip_all;
+            # skip_all;
 
             my $MOD       = 'File::KDBX';
             my $DIST      = 'File-KDBX';
@@ -109,6 +109,7 @@ subtest 'Unit test' => sub {
                 'normal_dist'   => $DIST,
                 'no_cache_mod'  => $MOD,
                 'no_cache_dist' => $DIST,
+                'bogus_core'    => 'strict',
                 'bogus_mod'     => 'Bogus::Module',
                 'bogus_dist'    => 'Bogus-Dist',
                 'bogus_mod_end' => $MOD,
@@ -244,7 +245,7 @@ subtest 'Unit test' => sub {
         };
 
         subtest 'Find files' => sub {
-            #skip_all;
+            # skip_all;
 
             my $DIST = 'Padre';
             my $URL  = 'https://cpan.metacpan.org/authors/id/S/SZ/SZABGAB/Padre-1.02.tar.gz';
@@ -298,7 +299,7 @@ subtest 'Unit test' => sub {
     };
 
     subtest 'Merge prereqs' => sub {
-        #skip_all;
+        # skip_all;
 
         my $DIST = 'Regexp-Debugger';
 
@@ -390,12 +391,12 @@ subtest 'Unit test' => sub {
     };
 
     subtest 'Check packages' => sub {
-        #skip_all;
+        # skip_all;
 
         my $DIST = 'Regexp-Debugger';
 
         subtest 'Get Arch prereqs' => sub {
-            #skip_all;
+            # skip_all;
 
             my %TESTS_PKGS = (
                 'normal'   => $DIST,
@@ -460,7 +461,7 @@ subtest 'Unit test' => sub {
         };
 
         subtest 'Get JSON' => sub {
-            #skip_all;
+            # skip_all;
 
             my %env = (
                 user_agent   => "$DEFS{class}/$DEFS{ver}",
@@ -505,7 +506,7 @@ subtest 'Unit test' => sub {
         };
 
         subtest 'Get Perl core modules list' => sub {
-            #skip_all;
+            # skip_all;
 
             my %TESTS_CORE = (
                 'normal'      => 'v5.6.0',
@@ -550,7 +551,7 @@ subtest 'Unit test' => sub {
 
 # Test if App::cpan2arch methods work together correctly.
 subtest 'Integration test' => sub {
-    #skip_all;
+    # skip_all;
 
     subtest 'PKGBUILD output (default)' => sub {
         my $TODO = todo 'This test fails whenever Arch packages change';

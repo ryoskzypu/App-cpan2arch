@@ -57,6 +57,11 @@ method get_metadata ()
         $self->_pdbg("Dist\n");
         $self->_pdump( '$dist', \$dist, "\n" );
 
+        if ( $dist eq 'perl' ) {
+            warn "$prog: invalid perl interpreter release ($module is a Perl core module)\n";
+            return 1;
+        }
+
         $rel = $self->_get_release($dist);
         return 1 if $rel == 1;
 

@@ -4787,7 +4787,7 @@ my %EXPECTED = (
                 'perl-b-keywords>=1.23'
                 'perl-carp'
                 'perl-config-tiny>=2'
-                'perl-exception-class>=1.23'
+                'perl-exception-class>=1.23'  # Package is flagged out-of-date on 2026-09-28.
                 'perl-exporter>=5.63'
                 'perl-file-path'
                 'perl-file-temp'

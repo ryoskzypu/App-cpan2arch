@@ -38,10 +38,6 @@ my %DISTS = (
         note    =>
           'EU::MM; PP; dup. prereqs/pkgs; optional_features; multi optional_features; single quote in optdepends',
     },
-    'FCGI-Client' => {
-        version => '0.09',
-        note    => 'M::B::T; PP; flagged OOD pkgs (Official)',
-    },
     'File-KDBX' => {
         version => '0.906',
         note    => 'EU::MM; PP; dup. prereqs/pkgs; optional_features; failed modules; missing pkgs',
@@ -64,7 +60,7 @@ my %DISTS = (
     },
     'Perl-Critic' => {
         version => '1.156',
-        note    => 'M::B; PP; dup. prereqs/pkgs; odd pkgs',
+        note    => 'M::B; PP; dup. prereqs/pkgs; flagged OOD pkgs (Official)',
     },
     'Pinto' => {
         version => '0.14',
@@ -77,6 +73,10 @@ my %DISTS = (
     'Regexp-Debugger' => {
         version => '0.002007',
         note    => 'EU::MM; PP; no license',
+    },
+    'Text-Tabs+Wrap' => {
+        version => '2024.001',
+        note    => 'EU::MM; PP; no license; unusual dist name',
     },
     'Time-ParseDate' => {
         version => '2026.0330',
@@ -2127,183 +2127,6 @@ my %EXPECTED = (
                 unset PERL5LIB PERL_LOCAL_LIB_ROOT
 
                 make install INSTALLDIRS=vendor DESTDIR="$pkgdir"
-            }
-            END
-    },
-    'FCGI-Client' => {
-        meta => {
-            abstract   => 'client library for fastcgi protocol',
-            author     => 'TOKUHIROM',
-            checksum   => 'd537cb09ce5aab3f447a6bb4415e46cc06efe01611cd56289b5582bdb46221e8',
-            dependency => [
-                {
-                    module       => 'Test::More',
-                    phase        => 'build',
-                    relationship => 'requires',
-                    version      => '0',
-                },
-                {
-                    module       => 'HTTP::Request',
-                    phase        => 'develop',
-                    relationship => 'requires',
-                    version      => '0',
-                },
-                {
-                    module       => 'Test::Perl::Critic',
-                    phase        => 'develop',
-                    relationship => 'requires',
-                    version      => '0',
-                },
-                {
-                    module       => 'Test::TCP',
-                    phase        => 'develop',
-                    relationship => 'requires',
-                    version      => '0',
-                },
-                {
-                    module       => 'Test::MinimumVersion::Fast',
-                    phase        => 'develop',
-                    relationship => 'requires',
-                    version      => '0.04',
-                },
-                {
-                    module       => 'FCGI',
-                    phase        => 'develop',
-                    relationship => 'requires',
-                    version      => '0',
-                },
-                {
-                    module       => 'Test::CPAN::Meta',
-                    phase        => 'develop',
-                    relationship => 'requires',
-                    version      => '0',
-                },
-                {
-                    module       => 'Test::Pod',
-                    phase        => 'develop',
-                    relationship => 'requires',
-                    version      => '1.41',
-                },
-                {
-                    module       => 'Test::PAUSE::Permissions',
-                    phase        => 'develop',
-                    relationship => 'requires',
-                    version      => '0.04',
-                },
-                {
-                    module       => 'Test::Spellunker',
-                    phase        => 'develop',
-                    relationship => 'requires',
-                    version      => 'v0.2.7',
-                },
-                {
-                    module       => 'IO::Socket::UNIX',
-                    phase        => 'runtime',
-                    relationship => 'requires',
-                    version      => '0',
-                },
-                {
-                    module       => 'Moo',
-                    phase        => 'runtime',
-                    relationship => 'requires',
-                    version      => '2',
-                },
-                {
-                    module       => 'perl',
-                    phase        => 'runtime',
-                    relationship => 'requires',
-                    version      => '5.008001',
-                },
-                {
-                    module       => 'Type::Tiny',
-                    phase        => 'runtime',
-                    relationship => 'requires',
-                    version      => '0',
-                },
-                {
-                    module       => 'Module::Build::Tiny',
-                    phase        => 'configure',
-                    relationship => 'requires',
-                    version      => '0.035',
-                },
-            ],
-            dist               => 'FCGI-Client',
-            download_url       => 'https://cpan.metacpan.org/authors/id/T/TO/TOKUHIROM/FCGI-Client-0.09.tar.gz',
-            has_license        => 'LICENSE',
-            has_module_install => false,
-            has_multi_licenses => false,
-            has_xs             => false,
-            license            => ['perl_5'],
-            name               => 'FCGI-Client-0.09',
-            spdx_expression    => undef,
-            version            => '0.09',
-        },
-        arch_prereqs => {
-            depends => [
-                'perl-io',
-                'perl-moo>=2',
-                {
-                    'perl-type-tiny' => { flag_date => '2025-11-22' },
-                },
-                'perl>=5.8.1',
-            ],
-            makedepends => [
-                'perl-module-build-tiny>=0.035',
-                'perl-test-simple',
-            ],
-        },
-        pkgbuild => <<~'END',
-            # Maintainer: Your Name <email@domain.tld>
-
-            _author=TOKUHIROM
-            _dist=FCGI-Client
-            pkgname=perl-${_dist@L}
-            pkgver=0.09
-            pkgrel=1
-            pkgdesc='client library for fastcgi protocol'
-            arch=('any')
-            url=https://metacpan.org/dist/$_dist
-            license=('Artistic-1.0-Perl OR GPL-1.0-or-later')
-            depends=(
-                'perl-io'
-                'perl-moo>=2'
-                'perl-type-tiny'  # Package is flagged out-of-date on 2025-11-22.
-                'perl>=5.8.1'
-            )
-            makedepends=(
-                'perl-module-build-tiny>=0.035'
-                'perl-test-simple'
-            )
-            options=('!emptydirs')
-            source=("https://cpan.metacpan.org/authors/id/${_author::1}/${_author::2}/$_author/$_dist-$pkgver.tar.gz")
-            sha256sums=('d537cb09ce5aab3f447a6bb4415e46cc06efe01611cd56289b5582bdb46221e8')
-
-            build()
-            {
-                cd "$_dist-$pkgver"
-
-                unset PERL_MB_OPT PERL5LIB PERL_LOCAL_LIB_ROOT
-
-                /usr/bin/perl Build.PL --create_packlist=0
-                ./Build
-            }
-
-            check()
-            {
-                cd "$_dist-$pkgver"
-
-                unset PERL5LIB PERL_LOCAL_LIB_ROOT
-
-                ./Build test
-            }
-
-            package()
-            {
-                cd "$_dist-$pkgver"
-
-                unset PERL5LIB PERL_LOCAL_LIB_ROOT
-
-                ./Build install --installdirs=vendor --destdir="$pkgdir"
             }
             END
     },
@@ -4913,7 +4736,9 @@ my %EXPECTED = (
                 'perl-b-keywords>=1.23',
                 'perl-carp',
                 'perl-config-tiny>=2',
-                'perl-exception-class>=1.23',
+                {
+                    'perl-exception-class>=1.23' => { flag_date => '2026-09-28' },
+                },
                 'perl-exporter>=5.63',
                 'perl-file-path',
                 'perl-file-temp',
@@ -6387,6 +6212,97 @@ my %EXPECTED = (
             options=('!emptydirs')
             source=("https://cpan.metacpan.org/authors/id/${_author::1}/${_author::2}/$_author/$_dist-$pkgver.tar.gz")
             sha256sums=('db096cf2e0e1e6127dacc40be6fbd526aa5ad41886a5bae00f4fe6a53a6c6ffb')
+
+            build()
+            {
+                cd "$_dist-$pkgver"
+
+                unset PERL_MM_OPT PERL5LIB PERL_LOCAL_LIB_ROOT
+                export PERL_MM_USE_DEFAULT=1
+
+                /usr/bin/perl Makefile.PL NO_PACKLIST=1 NO_PERLLOCAL=1
+                make
+            }
+
+            check()
+            {
+                cd "$_dist-$pkgver"
+
+                unset PERL5LIB PERL_LOCAL_LIB_ROOT
+
+                make test
+            }
+
+            package()
+            {
+                cd "$_dist-$pkgver"
+
+                unset PERL5LIB PERL_LOCAL_LIB_ROOT
+
+                make install INSTALLDIRS=vendor DESTDIR="$pkgdir"
+            }
+            END
+    },
+    'Text-Tabs+Wrap' => {
+        meta => {
+            abstract   => 'Expand tabs and do simple line wrapping',
+            author     => 'ARISTOTLE',
+            checksum   => 'fa83812ad59b111c543a3678115012aeb3e4ab3067c2261a38fdbcacf1b761cd',
+            dependency => [
+                {
+                    module       => 'ExtUtils::MakeMaker',
+                    phase        => 'build',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'ExtUtils::MakeMaker',
+                    phase        => 'configure',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'perl',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '5.006001',
+                },
+            ],
+            dist               => 'Text-Tabs+Wrap',
+            download_url       => 'https://cpan.metacpan.org/authors/id/A/AR/ARISTOTLE/Text-Tabs+Wrap-2024.001.tar.gz',
+            has_license        => false,
+            has_module_install => false,
+            has_multi_licenses => false,
+            has_xs             => false,
+            license            => ['unknown'],
+            name               => 'Text-Tabs+Wrap-2024.001',
+            spdx_expression    => undef,
+            version            => '2024.001',
+        },
+        arch_prereqs => {
+            depends     => ['perl>=5.6.1'],
+            makedepends => ['perl-extutils-makemaker'],
+        },
+        pkgbuild => <<~'END',
+            # Maintainer: Your Name <email@domain.tld>
+
+            _author=ARISTOTLE
+            _dist=Text-Tabs+Wrap
+            pkgname=perl-${_dist@L}
+            pkgver=2024.001
+            pkgrel=1
+            pkgdesc='Expand tabs and do simple line wrapping'
+            arch=('any')
+            url=https://metacpan.org/dist/$_dist
+            license=(
+                'unknown'  # License not provided in metadata.
+                           # Unknown SPDX ID; manual inspection is advised.
+            )
+            depends=('perl>=5.6.1')
+            makedepends=('perl-extutils-makemaker')
+            options=('!emptydirs')
+            source=("https://cpan.metacpan.org/authors/id/${_author::1}/${_author::2}/$_author/$_dist-$pkgver.tar.gz")
+            sha256sums=('fa83812ad59b111c543a3678115012aeb3e4ab3067c2261a38fdbcacf1b761cd')
 
             build()
             {

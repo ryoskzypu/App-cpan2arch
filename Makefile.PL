@@ -38,6 +38,7 @@ my %WriteMakefileArgs = (
         'Module::CoreList'       => '0',
         'Mojo::Log'              => '0',
         'Mojo::Promise'          => '0',
+        'Mojo::URL'              => '0',
         'Mojo::UserAgent'        => '0',
         'Mojolicious'            => '9.45',
         'Object::Pad'            => '0.825',

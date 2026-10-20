@@ -240,10 +240,11 @@ method _fetch (@prereqs)
     $self->_psub;
 
     require Mojo::Promise;
+    require Mojo::URL;
 
     my $prog      = $self->prog;
     my $mua_mcpan = $self->mua_mcpan;
-    my %endpoints = $self->endpoints;
+    my %endpoints = $self->mcpan_endpoints;
 
     my %env = $self->env;
     local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
@@ -259,12 +260,9 @@ method _fetch (@prereqs)
         sub ($prereq) {
             my $module  = $prereq->{module};
             my $version = $prereq->{version};
-            my $url     = $endpoints{download} . $module;
-            my $query;
+            my $url     = Mojo::URL->new( $endpoints{download} )->path($module);
 
-            $query  = 'version=' . $version if $version;       # Ignore 0 versions.
-            $url   .= '?' . $query          if defined $query;
-
+            $url->query( version => $version ) if $version;  # Ignore 0 versions.
             $mua_mcpan->get_p($url);
         },
         @prereqs,

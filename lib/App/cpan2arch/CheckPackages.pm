@@ -15,6 +15,10 @@ our $VERSION = 'v1.1.2';
 
 field $_mua_arch;
 field %_arch_prereqs :reader :writer;
+field %_arch_endpoints = (
+    archweb => 'https://archlinux.org/api/v1/',
+    aurweb  => 'https://aur.archlinux.org/rpc/v5/',
+);
 
 # Check whether prerequisite dists exist as packages in Arch's Official/AUR repos
 # and build PKGBUILD data.
@@ -34,11 +38,12 @@ method check_packages ()
         official => undef,
         aur      => undef,
     );
+
     {
         my %QUERIES = (
-            perl     => 'https://archlinux.org/packages/core/x86_64/perl/json/',
-            official => 'https://archlinux.org/packages/search/json/?q=perl-&repo=Core&repo=Extra',
-            aur      => 'https://aur.archlinux.org/rpc/v5/search/perl-?by=name',
+            perl     => $_arch_endpoints{archweb} . 'packages/core/x86_64/perl',
+            official => $_arch_endpoints{archweb} . 'packages/search/?q=perl-&repo=Core&repo=Extra',
+            aur      => $_arch_endpoints{aurweb} . 'search/perl-?by=name',
         );
 
         my %json = (
@@ -92,6 +97,8 @@ method check_packages ()
 method _preproc_prereqs ( $core_modules, $perl, %pkgs )
 {
     $self->_psub;
+
+    require Mojo::URL;
 
     my %cpan_prereqs = $self->cpan_prereqs;
     my %prereqs;
@@ -490,9 +497,11 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
 
                 # Exact pkgname search
                 foreach my $pkg (@exact_pkgs) {
-                    my $query = "https://archlinux.org/packages/search/json/?name=$pkg&repo=Core&repo=Extra";
+                    my $url = Mojo::URL->new( $_arch_endpoints{archweb} )
+                      ->path('packages/search/')
+                      ->query( name => $pkg, repo => 'Core', repo => 'Extra' );
 
-                    my $json = $self->_get_json($query);
+                    my $json = $self->_get_json($url);
                     return 1 if $json == 1;
                     next     unless scalar $json->{results}->@*;
 
@@ -570,17 +579,20 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
 
                 # Exact PackageBase search
                 {
-                    my $query = 'https://aur.archlinux.org/rpc/v5/info?';
+                    my $url = Mojo::URL->new( $_arch_endpoints{aurweb} )->path('info');
 
-                    # Construct multiple arg packages in a single query.
-                    foreach my ( $idx, $pkg ) ( indexed @exact_pkgs ) {
-                        my $arg = "arg[]=$pkg";
-                        $arg = "&$arg" unless $idx == 0;
+                    # Construct multiple arg packages in a single query
+                    # e.g. https://aur.archlinux.org/rpc/v5/info?arg[]=gtk2&arg[]=gtk2-perl
+                    {
+                        my @query;
+                        foreach my $pkg (@exact_pkgs) {
+                            push @query, 'arg[]', $pkg;
+                        }
 
-                        $query .= $arg;
+                        $url->query(@query);
                     }
 
-                    my $json = $self->_get_json($query);
+                    my $json = $self->_get_json($url);
                     return 1 if $json == 1;
                     last     unless scalar $json->{results}->@*;
 

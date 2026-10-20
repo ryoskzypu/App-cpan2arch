@@ -14,7 +14,7 @@ use Scalar::Util          qw< looks_like_number >;
 
 our $VERSION = 'v1.1.2';
 
-field %_endpoints :reader :writer = (
+field %_mcpan_endpoints :reader :writer = (
     module   => 'https://fastapi.metacpan.org/v1/module/',
     release  => 'https://fastapi.metacpan.org/v1/release/',
     download => 'https://fastapi.metacpan.org/v1/download_url/',
@@ -210,8 +210,10 @@ method _get_module ($module)
 {
     $self->_psub;
 
+    require Mojo::URL;
+
     my $prog = $self->prog;
-    my $url  = $_endpoints{module} . "$module?fields=distribution";
+    my $url  = Mojo::URL->new( $_mcpan_endpoints{module} )->path($module)->query( fields => 'distribution' );
     my $json;
 
     my $res = do {
@@ -248,17 +250,19 @@ method _get_release ($dist)
 {
     $self->_psub;
 
+    require Mojo::URL;
+
     my %args    = $self->args;
     my $version = $args{version};
     my $prog    = $self->prog;
 
-    my $query = "distribution:$dist%20AND%20";
+    my $query = "distribution:$dist AND ";
     $query
       .= defined $version
       ? "version:$version"
       : 'status:latest';
 
-    my $url = $_endpoints{release} . "_search?q=$query";
+    my $url = Mojo::URL->new( $_mcpan_endpoints{release} )->path('_search')->query( q => $query );
 
     my $res = do {
         try {

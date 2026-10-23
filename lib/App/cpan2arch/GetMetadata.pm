@@ -35,7 +35,7 @@ method get_metadata ()
 
     # Get the module/distribution and its release.
     my $dist;
-    my $rel;
+    my %rel;
     {
         my $prog    = $self->prog;
         my %args    = $self->args;
@@ -62,27 +62,28 @@ method get_metadata ()
             return 1;
         }
 
-        $rel = $self->_get_release($dist);
-        return 1 if $rel == 1;
+        my $ret = $self->_get_release($dist);
+        return 1 if $ret == 1;
+        %rel = $ret->%*;
 
-        if ( !$rel->{authorized} ) {
-            warn "$prog: $rel->{name} release by $rel->{author} is unauthorized."
+        if ( !$rel{authorized} ) {
+            warn "$prog: $rel{name} release by $rel{author} is unauthorized."
               . " You may want to check https://metacpan.org/dist/$dist\n";
         }
 
         $self->_pdbg("Release\n");
-        $self->_pdump( '$rel', \$rel, "\n" );
+        $self->_pdump( '$rel', \%rel, "\n" );
     }
 
     # Find Module::Install, license, and XS files in the dist.
-    my $ret = $self->_find_files( $dist, $rel->{download_url} );
+    my $ret = $self->_find_files( $dist, $rel{download_url} );
     return 1 if looks_like_number($ret) && $ret == 1;
     my %files = $ret->%*;
 
     # Get 'optionals_features' descriptions (will be added to the optdepends array).
     # See https://metacpan.org/pod/CPAN::Meta::Spec#optional_features.
     {
-        foreach my ( $feature, $feat_info ) ( $rel->{metadata}{optional_features}->%* ) {
+        foreach my ( $feature, $feat_info ) ( $rel{metadata}{optional_features}->%* ) {
 
             foreach my ( $phase, $phase_info ) ( $feat_info->{prereqs}->%* ) {
 
@@ -99,16 +100,16 @@ method get_metadata ()
     }
 
     %_meta = (
-        author             => $rel->{author},
-        name               => $rel->{name},
-        dist               => $rel->{distribution},
-        version            => $rel->{name} =~ s{\A\Q$rel->{distribution}\E[-_]+}{}r,
-        abstract           => $rel->{abstract},
-        license            => $rel->{license},
-        spdx_expression    => $rel->{metadata}{x_spdx_expression},
-        dependency         => $rel->{dependency},
-        download_url       => $rel->{download_url},
-        checksum           => $rel->{checksum_sha256},
+        author             => $rel{author},
+        name               => $rel{name},
+        dist               => $rel{distribution},
+        version            => $rel{name} =~ s{\A\Q$rel{distribution}\E[-_]+}{}r,
+        abstract           => $rel{abstract},
+        license            => $rel{license},
+        spdx_expression    => $rel{metadata}{x_spdx_expression},
+        dependency         => $rel{dependency},
+        download_url       => $rel{download_url},
+        checksum           => $rel{checksum_sha256},
         has_module_install => $files{mi},
         has_license        => $files{license},
         has_multi_licenses => $files{has_multi_licenses},
@@ -358,7 +359,7 @@ method _find_files ( $dist, $download_url )
             }
 
             @tar_files = $tar->get_files;
-            #$self->_pdump( '@tar_files', \@tar_files, "\n" );
+            # $self->_pdump( '@tar_files', \@tar_files, "\n" );
         }
 
         my @licenses;

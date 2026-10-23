@@ -14,6 +14,7 @@ use v5.42.0;
 
 use strict;
 use warnings;
+use builtin qw< is_bool >;
 
 use Test2::V1 -utf8, qw<
     fail
@@ -31,14 +32,13 @@ use lib 't/lib';
 use TestData qw< expected_data test_diff >;
 
 use App::cpan2arch;
-use builtin qw< is_bool >;
 use Capture::Tiny 0.50 qw< capture_stdout capture_stderr >;
 use Path::Tiny 0.150;
 use Devel::CheckBin 0.04;
 
 no warnings qw< experimental::builtin >;
 
-my $expected = expected_data();
+my %expected = expected_data();
 
 # Defaults
 my %DEFS = (
@@ -55,10 +55,10 @@ my %FAKE = (
 
 # Unit test each method separately.
 subtest 'Unit test' => sub {
-    #skip_all;
+    # skip_all;
 
     subtest 'Construct App::cpan2arch instance' => sub {
-        #skip_all;
+        # skip_all;
 
         my $c2a = App::cpan2arch->new;
 
@@ -69,7 +69,7 @@ subtest 'Unit test' => sub {
     };
 
     subtest 'Environment processing' => sub {
-        #skip_all;
+        # skip_all;
 
         my $TODO = todo 'Test fails when parent shell exports the same vars';
 
@@ -174,7 +174,7 @@ subtest 'Unit test' => sub {
     #   Do not test --help and --version because they must exit() immediately when
     #   invoked via CLI; they are so simple that can be skipped.
     subtest 'Options processing' => sub {
-        #skip_all;
+        # skip_all;
 
         my %TESTS_OPTS = (
             'nothing' => {
@@ -295,7 +295,7 @@ subtest 'Unit test' => sub {
     };
 
     subtest 'Compare Perl dist versions' => sub {
-        #skip_all;
+        # skip_all;
 
         my %TESTS_VER = (
             bogus_ver => {
@@ -386,14 +386,14 @@ subtest 'Unit test' => sub {
     };
 
     subtest 'PKGBUILD generation' => sub {
-        #skip_all;
+        # skip_all;
 
         my %env = (
             packager => $DEFS{packager},
-            #debug    => true,
+            # debug    => true,
         );
 
-        foreach my ( $dist, $data ) ( $expected->%* ) {
+        foreach my ( $dist, $data ) ( %expected ) {
             subtest $dist => sub {
                 note( $data->{note} );
 
@@ -417,7 +417,7 @@ subtest 'Unit test' => sub {
 
     # Test output behavior from generated PKGBUILD.
     subtest 'PKGBUILD output' => sub {
-        #skip_all;
+        # skip_all;
 
         my $DIST = 'Regexp-Debugger';
 
@@ -464,7 +464,7 @@ subtest 'Unit test' => sub {
 
                     my %env = (
                         packager => $DEFS{packager},
-                        #debug    => true,
+                        # debug    => true,
                     );
 
                     my %SRCINFO = (
@@ -556,7 +556,7 @@ subtest 'Unit test' => sub {
                     # Expected updated PKGBUILD
                     my $updated_default;
                     {
-                        $updated_default = $expected->{$DIST}{pkgbuild} =~ s{
+                        $updated_default = $expected{$DIST}{pkgbuild} =~ s{
                             \A
                             \#\ Maintainer:\ [^\n]+\n
                             \K
@@ -576,8 +576,8 @@ subtest 'Unit test' => sub {
 
                             # Fake necessary data for generation.
                             $c2a->set_env(%env);
-                            $c2a->set_meta( $expected->{$DIST}{meta}->%* );
-                            $c2a->set_arch_prereqs( $expected->{$DIST}{arch_prereqs}->%* );
+                            $c2a->set_meta( $expected{$DIST}{meta}->%* );
+                            $c2a->set_arch_prereqs( $expected{$DIST}{arch_prereqs}->%* );
 
                             $c2a->generate_pkgbuild;
                             my %pkgbuild = $c2a->pkgbuild;
@@ -678,7 +678,7 @@ subtest 'Unit test' => sub {
                     }
                 }
                 elsif ( $opt eq '--write' ) {
-                    #skip_all;
+                    # skip_all;
 
                     foreach my ( $t, $name ) ( $info->%* ) {
                         subtest "$t ($name)" => sub {
@@ -690,7 +690,7 @@ subtest 'Unit test' => sub {
                             $c2a->_process_opts( $t eq 'nothing' ? undef : \@argv );
 
                             # Generate PKGBUILD to compare against file.
-                            my %pkgbuild = ( output => $expected->{$DIST}{pkgbuild} );
+                            my %pkgbuild = ( output => $expected{$DIST}{pkgbuild} );
                             $c2a->set_pkgbuild(%pkgbuild) if $t ne 'nothing';
 
                             # Emulate current dir behavior.
@@ -732,12 +732,12 @@ subtest 'Unit test' => sub {
                     }
                 }
                 elsif ( $opt eq 'STDOUT' ) {
-                    #skip_all;
+                    # skip_all;
 
                     my $c2a = App::cpan2arch->new;
 
                     # Generate PKGBUILD to compare against STDOUT.
-                    my %pkgbuild = ( output => $expected->{$DIST}{pkgbuild} );
+                    my %pkgbuild = ( output => $expected{$DIST}{pkgbuild} );
                     $c2a->set_pkgbuild(%pkgbuild);
 
                     my ( $stdout, @ret ) = capture_stdout {

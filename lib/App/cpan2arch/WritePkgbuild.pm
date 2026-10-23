@@ -853,7 +853,7 @@ method write_pkgbuild ()
                 push $_generated_meta{source}->@*,     $meta{download_url};
                 push $_generated_meta{sha256sums}->@*, $meta{checksum};
 
-                #$self->_pdump( '%_generated_meta', \%_generated_meta, "\n" );
+                # $self->_pdump( '%_generated_meta', \%_generated_meta, "\n" );
             }
 
             %meta_a = sort_meta(%srcinfo_meta);
@@ -995,7 +995,7 @@ method write_pkgbuild ()
                     }
                 }
 
-                #$self->_pdump( '@rows', \@rows, "\n" );
+                # $self->_pdump( '@rows', \@rows, "\n" );
 
                 my $table = Term::Table->new(
                     collapse => 1,

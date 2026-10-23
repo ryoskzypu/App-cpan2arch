@@ -6446,7 +6446,7 @@ foreach my ( $dist, $info ) (%DISTS) {
 
 sub expected_data ()
 {
-    return \%EXPECTED;
+    return %EXPECTED;
 }
 
 # Test text differences and show diff.

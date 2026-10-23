@@ -33,8 +33,8 @@ method check_packages ()
     $self->_init_mua_arch;
 
     # Query Arch's perl pkg and Official + AUR Perl pkgs in bulk.
-    my $perl;
     my %pkgs = (
+        perl     => undef,
         official => undef,
         aur      => undef,
     );
@@ -59,7 +59,7 @@ method check_packages ()
             return 1 if $json{$q} == 1;
 
             if ( $q eq 'perl' ) {
-                $perl = $json{perl};
+                $pkgs{perl} = $json{perl};
             }
             elsif ( $q eq 'official' ) {
                 $pkgs{official} = [ $json{official}{results}->@* ];
@@ -78,14 +78,13 @@ method check_packages ()
             }
         }
 
-        #$self->_pdump('$perl', \$perl, '');
-        #$self->_pdump('%pkgs', \%pkgs, "\n");
+        # $self->_pdump('%pkgs', \%pkgs, "\n");
     }
 
-    my $core_modules = $self->_get_corelist( $perl->{pkgver} );
+    my $core_modules = $self->_get_corelist( $pkgs{perl}{pkgver} );
     return 1 if $core_modules == 1;
 
-    my $prereqs = $self->_preproc_prereqs( $core_modules, $perl, %pkgs );
+    my $prereqs = $self->_preproc_prereqs( $core_modules, %pkgs );
     return 1 if $prereqs == 1;
 
     $self->_postproc_prereqs( $prereqs->%* );
@@ -94,7 +93,7 @@ method check_packages ()
 }
 
 # Pre-process prerequisites while checking for Arch packages.
-method _preproc_prereqs ( $core_modules, $perl, %pkgs )
+method _preproc_prereqs ( $core_modules, %pkgs )
 {
     $self->_psub;
 
@@ -214,7 +213,7 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
 
                 $prereqs{$var}{perl} = {
                     version   => $version,
-                    flag_date => _fmt_date( $perl->{flag_date}, 'official' ),
+                    flag_date => _fmt_date( $pkgs{perl}{flag_date}, 'official' ),
                 };
 
                 $self->_pdbg("\n\n");
@@ -297,7 +296,7 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
                 }
 
                 # Dist exists in the perl package provides array.
-                if ( any { /\A \Q$pkg\E (?> = [0-9._]+ )?\z/x } $perl->{provides}->@* ) {
+                if ( any { /\A \Q$pkg\E (?> = [0-9._]+ )?\z/x } $pkgs{perl}{provides}->@* ) {
                     $prereqs{$var}{$pkg}{version} = $version;
                     $prereqs{$var}{$pkg}{module}  = $module if $var eq 'optdepends';
                     $seen_pkgs{$pkg}              = {};
@@ -834,7 +833,7 @@ method _get_corelist ($ver)
     $core_modules = Module::CoreList->find_version($perl_cur_ver)
       unless defined $core_modules;
 
-    #$self->_pdump('$core_modules', $core_modules, "\n");
+    # $self->_pdump('$core_modules', $core_modules, "\n");
 
     if ( !defined $core_modules ) {
         warn "$prog: failed to get Perl core modules list\n";

@@ -46,11 +46,13 @@ method merge_prereqs ()
         optdepends   => undef,
     );
 
-    my $prereqs = $self->_get_dists;
-    return 1 if looks_like_number($prereqs) && $prereqs == 1;
-    $self->_pdump( '$prereqs', $prereqs, "\n" );
+    my $ret = $self->_get_dists;
+    return 1 if looks_like_number($ret) && $ret == 1;
+    my @prereqs = $ret->@*;
 
-    foreach my $dep ( $prereqs->@* ) {
+    $self->_pdump( '$prereqs', \@prereqs, "\n" );
+
+    foreach my $dep ( @prereqs ) {
         my ( $module, $dist, $phase, $relationship, $version, $failed ) =
           $dep->@{ qw< module dist phase relationship version failed > };
 

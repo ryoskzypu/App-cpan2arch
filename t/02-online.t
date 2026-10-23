@@ -50,7 +50,7 @@ my $has_cache_mods = do {
     }
 };
 
-my $expected = expected_data();
+my %expected = expected_data();
 
 # Defaults
 my %DEFS = (
@@ -87,7 +87,7 @@ subtest 'Unit test' => sub {
             $cache_key       => $cache_path,
             cache_expiration => '1d',
             cache_ignore     => $t =~ /\Ano_cache/ ? true : false,
-            #debug            => true,
+            # debug            => true,
         );
 
         return ( \%env, $cache_path );
@@ -101,7 +101,7 @@ subtest 'Unit test' => sub {
 
             my $MOD       = 'File::KDBX';
             my $DIST      = 'File-KDBX';
-            my $VER       = $expected->{$DIST}{version};
+            my $VER       = $expected{$DIST}{version};
             my $BOGUS_END = 'https://bogus/';
 
             my %TESTS_META = (
@@ -171,7 +171,7 @@ subtest 'Unit test' => sub {
                         }
                         else {
                             my @caches = path($cache_path)->child('Default')->children;
-                            #system( 'tree', '-a', $cache_path );
+                            # system( 'tree', '-a', $cache_path );
 
                             is(
                                 scalar @caches, number_gt(0),
@@ -182,7 +182,7 @@ subtest 'Unit test' => sub {
                             $c2a->_process_opts( [ qw< --clear >, $DIST ] );
                             $c2a->_get_mua('mcpan');
                             my @cl_caches = path($cache_path)->children;
-                            #system( 'tree', '-a', $cache_path );
+                            # system( 'tree', '-a', $cache_path );
 
                             is(
                                 scalar @caches, number_gt( scalar @cl_caches ),
@@ -195,12 +195,12 @@ subtest 'Unit test' => sub {
                     # be tested reliably like the versioned dist.
                     if ( $t eq 'normal_dist' || $t eq 'no_cache_dist' ) {
                         is(
-                            %optionals, $expected->{$DIST}{optionals}->%*,
+                            %optionals, $expected{$DIST}{optionals}->%*,
                             'optionals match',
                         );
 
                         is(
-                            %meta, $expected->{$DIST}{meta}->%*,
+                            %meta, $expected{$DIST}{meta}->%*,
                             'metadata match',
                         );
                     }
@@ -322,7 +322,7 @@ subtest 'Unit test' => sub {
                 }
 
                 $c2a->_init_mua_mcpan;
-                $c2a->set_meta( $expected->{$DIST}{meta}->%* );
+                $c2a->set_meta( $expected{$DIST}{meta}->%* );
 
                 if ( $t eq 'bogus_url' ) {
                     my %endpoints = $c2a->mcpan_endpoints;
@@ -378,7 +378,7 @@ subtest 'Unit test' => sub {
                 }
 
                 is(
-                    %cpan_prereqs, $expected->{$DIST}{cpan_prereqs}->%*,
+                    %cpan_prereqs, $expected{$DIST}{cpan_prereqs}->%*,
                     'prereqs match',
                 );
 
@@ -415,7 +415,7 @@ subtest 'Unit test' => sub {
                         $c2a->set_env( $env->%* );
                     }
 
-                    $c2a->set_cpan_prereqs( $expected->{$DIST}{cpan_prereqs}->%* );
+                    $c2a->set_cpan_prereqs( $expected{$DIST}{cpan_prereqs}->%* );
 
                     my $ret          = $c2a->check_packages;
                     my %arch_prereqs = $c2a->arch_prereqs;
@@ -448,7 +448,7 @@ subtest 'Unit test' => sub {
                     }
 
                     is(
-                        %arch_prereqs, $expected->{$DIST}{arch_prereqs}->%*,
+                        %arch_prereqs, $expected{$DIST}{arch_prereqs}->%*,
                         'prereqs match',
                     );
 
@@ -466,7 +466,7 @@ subtest 'Unit test' => sub {
             my %env = (
                 user_agent   => "$DEFS{class}/$DEFS{ver}",
                 cache_ignore => true,
-                #debug        => true,
+                # debug        => true,
             );
 
             my %TESTS_JSON = (
@@ -556,7 +556,7 @@ subtest 'Integration test' => sub {
     subtest 'PKGBUILD output (default)' => sub {
         my $TODO = todo 'This test fails whenever Arch packages change';
 
-        foreach my ( $dist, $data ) ( $expected->%* ) {
+        foreach my ( $dist, $data ) ( %expected ) {
             subtest $dist => sub {
                 my $c2a = App::cpan2arch->new;
 

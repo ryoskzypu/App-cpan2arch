@@ -247,6 +247,9 @@ method _preproc_prereqs ( $core_modules, %pkgs )
 
                 my $pkg = lc "perl-$dist";
 
+                # perl pkg declares Text-Tabs+Wrap dist without +Wrap in provides.
+                $pkg =~ s{\+wrap\z}{} if $dist eq 'Text-Tabs+Wrap';
+
                 # Skip duplicated variable distros but get the lesser version.
                 if ( exists $prereqs{$var}{$pkg} ) {
                     $self->_pdbg("found var dist dupe; skip\n");

@@ -326,7 +326,7 @@ subtest 'Unit test' => sub {
 
                 if ( $t eq 'bogus_url' ) {
                     my %endpoints = $c2a->mcpan_endpoints;
-                    $endpoints{download} = $name;
+                    $endpoints{module} = $name;
                     $c2a->set_mcpan_endpoints(%endpoints);
 
                     my ( $stderr, @ret ) = capture_stderr {

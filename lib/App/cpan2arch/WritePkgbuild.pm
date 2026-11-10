@@ -2,14 +2,13 @@ use v5.42.0;
 
 use strict;
 use warnings;
+use open qw< :std :encoding(UTF-8) >;
 no source::encoding;  # Avoid dying on v5.42.0 (non-ASCII char in POD).
 
 use Object::Pad 0.825;
 
 package App::cpan2arch::WritePkgbuild;  # For toolchain compatibility.
 role App::cpan2arch::WritePkgbuild;
-
-use open qw< :std :encoding(UTF-8) >;
 
 use File::Basename qw< basename >;
 use Scalar::Util   qw< looks_like_number >;
@@ -20,7 +19,7 @@ use List::Util     qw<
     uniq
 >;
 
-$|++;  # Disable STDOUT buffering.
+$|++;                                   # Disable STDOUT buffering.
 
 our $VERSION = 'v1.1.2';
 

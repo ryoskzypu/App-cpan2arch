@@ -157,14 +157,13 @@ method _get_dists ()
 
     my $prog = $self->prog;
 
-    # Filter undesired modules.
+    # Filter modules not found on /module endpoint.
     my @prereqs;
     my @ignored;
     {
         my @NOT_FOUND = (
             qw<
                 Config
-                Errno
             >
         );
 
@@ -251,20 +250,14 @@ method _fetch (@prereqs)
     my %env = $self->env;
     local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
 
-    # Fetch three dists at a time using the download_url endpoint.
-    #
-    # References:
-    #   https://github.com/metacpan/metacpan-api/blob/master/docs/API-docs.md#download_urlmodule.
-    #   https://metacpan.org/release/MIYAGAWA/App-cpanminus-1.7049/source/lib/App/cpanminus/fatscript.pm#L926
-    #   https://github.com/metacpan/MetaCPAN-Client/blob/396ba371317f114db04967c90be64bb46fd7fd2c/lib/MetaCPAN/Client.pm#L217
+    # Fetch three dists at a time using the /module endpoint.
     return Mojo::Promise->map(
         { concurrency => 3 },
         sub ($prereq) {
             my $module  = $prereq->{module};
             my $version = $prereq->{version};
-            my $url     = Mojo::URL->new( $endpoints{download} )->path($module);
+            my $url     = Mojo::URL->new( $endpoints{module} )->path($module)->query( fields => 'distribution' );
 
-            $url->query( version => $version ) if $version;  # Ignore 0 versions.
             $mua_mcpan->get_p($url);
         },
         @prereqs,
@@ -285,19 +278,14 @@ method _fetch (@prereqs)
                       my $req = $tx->[0]->req;
                       my $url = $req->url;
                       my $mod = $url->path->parts->[-1];
-                      my $ver = $url->query->param('version');
                       my $msg = $res->message;
 
                       my $err = "$prog: failed to fetch $mod module";
-                      $err .= " (query version: $ver)" if defined $ver;
 
                       warn "Failed to fetch '$url': $msg";
                       warn "$err\n";
 
-                      push @_prereq_dists, {
-                          failed  => true,
-                          version => $ver,
-                      };
+                      push @_prereq_dists, { failed  => true };
                   }
               }
           }

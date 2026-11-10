@@ -17,7 +17,6 @@ our $VERSION = 'v1.1.2';
 field %_mcpan_endpoints :reader :writer = (
     module   => 'https://fastapi.metacpan.org/v1/module/',
     release  => 'https://fastapi.metacpan.org/v1/release/',
-    download => 'https://fastapi.metacpan.org/v1/download_url/',
 );
 field $_mua_mcpan :reader;
 field %_optionals :reader;
